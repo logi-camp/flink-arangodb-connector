@@ -1,9 +1,5 @@
 package org.mongoflink.sink;
 
-import org.mongoflink.bson.CdcDocument;
-import org.mongoflink.internal.connection.MongoClientProvider;
-import org.mongoflink.internal.connection.MongoColloctionProviders;
-
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.TableResult;
@@ -15,6 +11,9 @@ import com.google.common.collect.Lists;
 import org.bson.BsonDateTime;
 import org.bson.Document;
 import org.junit.Test;
+import top.logicamp.arangodb_flink_connector.bson.CdcDocument;
+import top.logicamp.arangodb_flink_connector.internal.connection.MongoClientProvider;
+import top.logicamp.arangodb_flink_connector.internal.connection.MongoColloctionProviders;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

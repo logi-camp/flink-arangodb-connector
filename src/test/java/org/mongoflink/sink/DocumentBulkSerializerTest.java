@@ -2,6 +2,8 @@ package org.mongoflink.sink;
 
 import org.bson.Document;
 import org.junit.Test;
+import top.logicamp.arangodb_flink_connector.sink.DocumentBulk;
+import top.logicamp.arangodb_flink_connector.sink.DocumentBulkSerializer;
 
 import java.io.IOException;
 

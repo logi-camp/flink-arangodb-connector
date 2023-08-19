@@ -1,13 +1,13 @@
 package org.mongoflink.sink;
 
 import org.mongoflink.EmbeddedMongoTestBase;
-import org.mongoflink.serde.DocumentSerializer;
 
 import org.apache.flink.api.common.functions.RuntimeContext;
 import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.streaming.api.functions.source.datagen.DataGenerator;
 
 import org.bson.Document;
+import top.logicamp.arangodb_flink_connector.serde.DocumentSerializer;
 
 import java.util.Random;
 

@@ -1,7 +1,5 @@
 package org.mongoflink.sink;
 
-import org.mongoflink.config.MongoOptions;
-
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.RestOptions;
 import org.apache.flink.runtime.minicluster.MiniCluster;
@@ -11,6 +9,8 @@ import org.apache.flink.streaming.api.functions.source.datagen.DataGeneratorSour
 import org.apache.flink.streaming.api.graph.StreamGraph;
 
 import org.junit.Test;
+import top.logicamp.arangodb_flink_connector.config.MongoOptions;
+import top.logicamp.arangodb_flink_connector.sink.MongoSink;
 
 import java.util.Properties;
 

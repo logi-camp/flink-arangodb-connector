@@ -1,12 +1,15 @@
 package org.mongoflink.source.split;
 
 import org.mongoflink.EmbeddedMongoTestBase;
-import org.mongoflink.internal.connection.MongoClientProvider;
-import org.mongoflink.internal.connection.MongoColloctionProviders;
 
 import com.google.common.collect.Lists;
 import org.bson.Document;
 import org.junit.Test;
+import top.logicamp.arangodb_flink_connector.internal.connection.MongoClientProvider;
+import top.logicamp.arangodb_flink_connector.internal.connection.MongoColloctionProviders;
+import top.logicamp.arangodb_flink_connector.source.split.MongoSplit;
+import top.logicamp.arangodb_flink_connector.source.split.MongoSplitStrategy;
+import top.logicamp.arangodb_flink_connector.source.split.SamplingSplitStrategy;
 
 import java.util.List;
 import java.util.Random;

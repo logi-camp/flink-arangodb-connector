@@ -1,10 +1,6 @@
 package org.mongoflink.source;
 
 import org.mongoflink.EmbeddedMongoTestBase;
-import org.mongoflink.internal.connection.MongoClientProvider;
-import org.mongoflink.internal.connection.MongoColloctionProviders;
-import org.mongoflink.serde.DocumentDeserializer;
-import org.mongoflink.source.split.SamplingSplitStrategy;
 import org.mongoflink.utils.ListSink;
 
 import org.apache.flink.api.common.JobExecutionResult;
@@ -16,6 +12,11 @@ import com.mongodb.client.model.Projections;
 import com.google.common.collect.Lists;
 import org.bson.Document;
 import org.junit.Test;
+import top.logicamp.arangodb_flink_connector.internal.connection.MongoClientProvider;
+import top.logicamp.arangodb_flink_connector.internal.connection.MongoColloctionProviders;
+import top.logicamp.arangodb_flink_connector.serde.DocumentDeserializer;
+import top.logicamp.arangodb_flink_connector.source.MongoSource;
+import top.logicamp.arangodb_flink_connector.source.split.SamplingSplitStrategy;
 
 import java.util.List;
 import java.util.Random;

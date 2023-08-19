@@ -1,8 +1,5 @@
 package org.mongoflink.sink;
 
-import org.mongoflink.internal.connection.MongoClientProvider;
-import org.mongoflink.internal.connection.MongoColloctionProviders;
-
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.TableResult;
@@ -14,6 +11,8 @@ import com.google.common.collect.Lists;
 import org.bson.Document;
 import org.junit.Assert;
 import org.junit.Test;
+import top.logicamp.arangodb_flink_connector.internal.connection.MongoClientProvider;
+import top.logicamp.arangodb_flink_connector.internal.connection.MongoColloctionProviders;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;

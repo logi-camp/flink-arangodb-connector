@@ -1,8 +1,5 @@
 package org.mongoflink.sink.unit;
 
-import org.mongoflink.bson.CdcDocument;
-import org.mongoflink.sink.CommittableCdcTransaction;
-
 import com.mongodb.client.model.DeleteOneModel;
 import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.UpdateOptions;
@@ -11,6 +8,8 @@ import com.mongodb.client.model.WriteModel;
 import org.bson.Document;
 import org.junit.Assert;
 import org.junit.Test;
+import top.logicamp.arangodb_flink_connector.bson.CdcDocument;
+import top.logicamp.arangodb_flink_connector.sink.CommittableCdcTransaction;
 
 import java.util.Arrays;
 import java.util.List;
