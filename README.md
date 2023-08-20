@@ -2,7 +2,9 @@
 
 > This repository is under heavy development. Please don't use this in production mode.
 
-# Start to use
+Inspired by [mongo-flink](https://github.com/mongo-flink/mongo-flink) connector
+
+# How to use
 ## Prerequisite
 
 - Tested with Flink 1.17.
