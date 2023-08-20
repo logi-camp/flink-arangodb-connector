@@ -8,10 +8,14 @@ import com.arangodb.ArangoDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** A simple implementation of {@link ArangoDBClientProvider}. */
+/**
+ * A simple implementation of {@link ArangoDBClientProvider}.
+ */
 public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider {
 
-    /** Connection string to ArangoDB standalone instances, replica sets or sharded clusters. */
+    /**
+     * Connection string to ArangoDB standalone instances, replica sets or sharded clusters.
+     */
     private final String host;
 
     private final Integer port;
@@ -21,10 +25,14 @@ public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider 
     private final String user;
     private final Boolean useSsl;
 
-    /** The ArangoDB defaultDatabase to write to. */
+    /**
+     * The ArangoDB defaultDatabase to write to.
+     */
     private final String defaultDatabase;
 
-    /** The defaultCollection to write to. */
+    /**
+     * The defaultCollection to write to.
+     */
     private final String defaultCollection;
 
     private transient ArangoDB client;
@@ -82,6 +90,9 @@ public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider 
         synchronized (this) {
             if (database == null) {
                 database = getClient().db(defaultDatabase);
+                if (!database.exists()) {
+                    database.create();
+                }
             }
         }
         return database;
@@ -92,6 +103,9 @@ public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider 
         synchronized (this) {
             if (collection == null) {
                 collection = getDefaultDatabase().collection(defaultCollection);
+                if (!collection.exists()) {
+                    collection.create();
+                }
             }
         }
         return collection;
