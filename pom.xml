@@ -28,8 +28,8 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:logi-camp/flink-arangodb-connector.git</connection>
-        <developerConnection>scm:git:git@github.com:logi-camp/flink-arangodb-connector.git</developerConnection>
+        <connection>scm:git:git://github.com:logi-camp/flink-arangodb-connector.git</connection>
+        <developerConnection>scm:git:ssh://github.com:logi-camp/flink-arangodb-connector.git</developerConnection>
         <url>https://logicamp.top</url>
       <tag>arangodb-flink-connector-1.0</tag>
   </scm>
