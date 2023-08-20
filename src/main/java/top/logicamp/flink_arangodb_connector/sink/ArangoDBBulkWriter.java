@@ -8,8 +8,8 @@ import com.arangodb.ArangoCollection;
 import com.arangodb.entity.BaseDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.logicamp.flink_arangodb_connector.config.MongoConnectorOptions;
-import top.logicamp.flink_arangodb_connector.internal.connection.MongoClientProvider;
+import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
+import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBClientProvider;
 import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * Writer for MongoDB sink.
+ * Writer for ArangoDB sink.
  */
-public class MongoBulkWriter<IN> implements SinkWriter<IN> {
-    private final MongoClientProvider collectionProvider;
+public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
+    private final ArangoDBClientProvider collectionProvider;
 
     private transient ArangoCollection collection;
 
@@ -47,21 +47,21 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN> {
 
     private final RetryPolicy retryPolicy = new RetryPolicy(3, 1000L);
 
-    private final transient MongoConnectorOptions options;
+    private final transient ArangoDBConnectorOptions options;
 
     private transient volatile boolean initialized = false;
 
     private transient volatile boolean closed = false;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MongoBulkWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArangoDBBulkWriter.class);
 
     private final boolean upsertEnable;
     private final String[] upsertKeys;
 
-    public MongoBulkWriter(
-            MongoClientProvider collectionProvider,
+    public ArangoDBBulkWriter(
+            ArangoDBClientProvider collectionProvider,
             DocumentSerializer<IN> serializer,
-            MongoConnectorOptions options) {
+            ArangoDBConnectorOptions options) {
         this.upsertEnable = options.isUpsertEnable();
         this.upsertKeys = options.getUpsertKey();
         this.collectionProvider = collectionProvider;
@@ -73,11 +73,11 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN> {
         if (!flushOnCheckpoint && this.options.getFlushInterval().getSeconds() > 0) {
             this.scheduler =
                     Executors.newScheduledThreadPool(
-                            1, new ExecutorThreadFactory("mongodb-bulk-writer"));
+                            1, new ExecutorThreadFactory("arangodb-bulk-writer"));
             this.scheduledFuture =
                     scheduler.scheduleWithFixedDelay(
                             () -> {
-                                synchronized (MongoBulkWriter.this) {
+                                synchronized (ArangoDBBulkWriter.this) {
                                     if (initialized && !closed) {
                                         try {
                                             rollBulkIfNeeded(true);
@@ -146,7 +146,7 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN> {
      * tries. There may be concurrent flushes when concurrent checkpoints are enabled.
      *
      * <p>We manually retry write operations, because the driver doesn't support automatic retries
-     * for some MongoDB setups (e.g. standalone instances). TODO: This should be configurable in the
+     * for some ArangoDB setups (e.g. standalone instances). TODO: This should be configurable in the
      * future.
      */
     private synchronized void flush() {
@@ -169,7 +169,7 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN> {
                             break;
                         } catch (Exception e) {
                             // maybe partial failure
-                            LOGGER.error("Failed to flush data to MongoDB", e);
+                            LOGGER.error("Failed to flush data to ArangoDB", e);
                         }
                     } while (!closed && retryPolicy.shouldBackoffRetry());
                 }
@@ -272,7 +272,7 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN> {
 
     private void checkFlushException() throws IOException {
         if (flushException != null) {
-            throw new IOException("Failed to flush records to MongoDB", flushException);
+            throw new IOException("Failed to flush records to ArangoDB", flushException);
         }
     }
 

@@ -8,10 +8,10 @@ import com.arangodb.ArangoDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** A simple implementation of {@link MongoClientProvider}. */
-public class MongoSingleCollectionProvider implements MongoClientProvider {
+/** A simple implementation of {@link ArangoDBClientProvider}. */
+public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider {
 
-    /** Connection string to MongoDB standalone instances, replica sets or sharded clusters. */
+    /** Connection string to ArangoDB standalone instances, replica sets or sharded clusters. */
     private final String host;
 
     private final Integer port;
@@ -19,14 +19,13 @@ public class MongoSingleCollectionProvider implements MongoClientProvider {
     private final String password;
 
     private final String user;
-    private Boolean useSsl;
+    private final Boolean useSsl;
 
     /** The ArangoDB defaultDatabase to write to. */
     private final String defaultDatabase;
 
     /**
-     * The defaultCollection to write to. Must be a existing defaultCollection for MongoDB 4.2 and
-     * earlier versions.
+     * The defaultCollection to write to.
      */
     private final String defaultCollection;
 
@@ -37,9 +36,9 @@ public class MongoSingleCollectionProvider implements MongoClientProvider {
     private transient ArangoCollection collection;
 
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(MongoSingleCollectionProvider.class);
+            LoggerFactory.getLogger(ArangoDBSingleCollectionProvider.class);
 
-    public MongoSingleCollectionProvider(
+    public ArangoDBSingleCollectionProvider(
             String host, Integer port, String defaultDatabase, String defaultCollection, String password, String user, Boolean useSsl) {
         Preconditions.checkNotNull(host);
         Preconditions.checkNotNull(port);

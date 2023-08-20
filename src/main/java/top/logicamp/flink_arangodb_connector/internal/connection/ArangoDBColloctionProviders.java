@@ -2,8 +2,8 @@ package top.logicamp.flink_arangodb_connector.internal.connection;
 
 import org.apache.flink.util.Preconditions;
 
-/** A builder class for creating {@link MongoClientProvider}. */
-public class MongoColloctionProviders {
+/** A builder class for creating {@link ArangoDBClientProvider}. */
+public class ArangoDBColloctionProviders {
 
     public static Builder getBuilder() {
         return new Builder();
@@ -55,12 +55,12 @@ public class MongoColloctionProviders {
             return this;
         }
 
-        public MongoClientProvider build() {
+        public ArangoDBClientProvider build() {
             Preconditions.checkNotNull(host, "Host must not be null");
             Preconditions.checkNotNull(port, "Port must not be null");
             Preconditions.checkNotNull(database, "Database must not be null");
             Preconditions.checkNotNull(collection, "Collection must not be null");
-            return new MongoSingleCollectionProvider(host, port, database, collection, password, user, useSsl);
+            return new ArangoDBSingleCollectionProvider(host, port, database, collection, password, user, useSsl);
         }
     }
 }

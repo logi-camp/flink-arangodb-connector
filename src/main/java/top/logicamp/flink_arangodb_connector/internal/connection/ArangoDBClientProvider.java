@@ -1,36 +1,32 @@
 package top.logicamp.flink_arangodb_connector.internal.connection;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-
 import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDatabase;
 
 import java.io.Serializable;
 
-/** Provided for initiate and recreate {@link MongoClient}. */
-public interface MongoClientProvider extends Serializable {
+/** Provided for initiate and recreate {@link ArangoDB}. */
+public interface ArangoDBClientProvider extends Serializable {
 
     /**
-     * Create one or get the current {@link MongoClient}.
+     * Create one or get the current {@link ArangoDB}.
      *
-     * @return Current {@link MongoClient}.
+     * @return Current {@link ArangoDB}.
      */
     ArangoDB getClient();
 
     /**
      * Get the default database.
      *
-     * @return Current {@link MongoDatabase}.
+     * @return Current {@link ArangoDatabase}.
      */
     ArangoDatabase getDefaultDatabase();
 
     /**
      * Get the default collection.
      *
-     * @return Current {@link MongoCollection}.
+     * @return Current {@link ArangoCollection}.
      */
     ArangoCollection getDefaultCollection();
 
@@ -44,10 +40,10 @@ public interface MongoClientProvider extends Serializable {
     /**
      * Recreate a client. Used typically when a connection is timed out or lost.
      *
-     * @return A new {@link MongoClient}.
+     * @return A new {@link ArangoDB}.
      */
     ArangoDB recreateClient();
 
-    /** Close the underlying MongoDB connection. */
+    /** Close the underlying ArangoDB connection. */
     void close();
 }

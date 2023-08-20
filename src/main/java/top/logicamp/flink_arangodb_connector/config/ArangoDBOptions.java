@@ -1,16 +1,16 @@
 package top.logicamp.flink_arangodb_connector.config;
 
-import top.logicamp.flink_arangodb_connector.sink.MongoSink;
+import top.logicamp.flink_arangodb_connector.sink.ArangoDBSink;
 
 import java.io.Serializable;
 
 /**
- * Config options for {@link MongoSink}.
+ * Config options for {@link ArangoDBSink}.
  *
- * <p>Deprecated. Please use {@link MongoConnectorOptions} instead.
+ * <p>Deprecated. Please use {@link ArangoDBConnectorOptions} instead.
  */
 @Deprecated
-public class MongoOptions implements Serializable {
+public class ArangoDBOptions implements Serializable {
 
     public static final String SINK_TRANSACTION_ENABLED = "sink.transaction.enable";
 

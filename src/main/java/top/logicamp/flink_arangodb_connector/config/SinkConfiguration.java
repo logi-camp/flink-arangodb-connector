@@ -1,13 +1,13 @@
 package top.logicamp.flink_arangodb_connector.config;
 
-import top.logicamp.flink_arangodb_connector.sink.MongoSink;
+import top.logicamp.flink_arangodb_connector.sink.ArangoDBSink;
 
 import java.io.Serializable;
 
 /**
- * Configuration for {@link MongoSink}.
+ * Configuration for {@link ArangoDBSink}.
  *
- * <p>Deprecated. Please use {@link MongoConnectorOptions} instead.
+ * <p>Deprecated. Please use {@link ArangoDBConnectorOptions} instead.
  */
 @Deprecated
 public class SinkConfiguration implements Serializable {

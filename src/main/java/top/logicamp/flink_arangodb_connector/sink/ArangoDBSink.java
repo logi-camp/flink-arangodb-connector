@@ -3,11 +3,11 @@ package top.logicamp.flink_arangodb_connector.sink;
 import org.apache.flink.api.connector.sink2.Sink;
 import org.apache.flink.api.connector.sink2.SinkWriter;
 
-import top.logicamp.flink_arangodb_connector.config.MongoConnectorOptions;
+import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
 import top.logicamp.flink_arangodb_connector.config.SinkConfiguration;
 import top.logicamp.flink_arangodb_connector.config.SinkConfigurationFactory;
-import top.logicamp.flink_arangodb_connector.internal.connection.MongoClientProvider;
-import top.logicamp.flink_arangodb_connector.internal.connection.MongoColloctionProviders;
+import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBClientProvider;
+import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBColloctionProviders;
 import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
 
 import java.io.IOException;
@@ -15,25 +15,18 @@ import java.time.Duration;
 import java.util.Properties;
 
 /**
- * Flink sink connector for MongoDB. MongoSink supports transaction mode for MongoDB 4.2+ and
- * non-transaction mode for Mongo 3.0+.
- *
- * <p>In transaction mode, all writes will be buffered in memory and committed to MongoDB in
- * per-taskmanager transactions on successful checkpoints, which ensures exactly-once semantics.
- *
- * <p>In non-transaction mode, writes would be periodically flushed to MongoDB, which provides
- * at-least-once semantics.
+ * Flink sink connector for ArangoDB.
  */
-public class MongoSink<IN> implements Sink<IN> {
+public class ArangoDBSink<IN> implements Sink<IN> {
 
-    private final MongoClientProvider clientProvider;
+    private final ArangoDBClientProvider clientProvider;
 
     private final DocumentSerializer<IN> serializer;
 
-    private final MongoConnectorOptions options;
+    private final ArangoDBConnectorOptions options;
 
     @Deprecated
-    public MongoSink(
+    public ArangoDBSink(
             String host,
             Integer port,
             String database,
@@ -46,7 +39,7 @@ public class MongoSink<IN> implements Sink<IN> {
         SinkConfiguration sinkConfiguration = SinkConfigurationFactory.fromProperties(properties);
         this.serializer = serializer;
         this.clientProvider =
-                MongoColloctionProviders.getBuilder()
+                ArangoDBColloctionProviders.getBuilder()
                         .host(host)
                         .port(port)
                         .database(database)
@@ -56,7 +49,7 @@ public class MongoSink<IN> implements Sink<IN> {
                         .useSsl(useSsl)
                         .build();
         this.options =
-                MongoConnectorOptions.builder()
+                ArangoDBConnectorOptions.builder()
                         .withDatabase(database)
                         .withCollection(collection)
                         .withHost(host)
@@ -72,11 +65,11 @@ public class MongoSink<IN> implements Sink<IN> {
                         .build();
     }
 
-    public MongoSink(DocumentSerializer<IN> serializer, MongoConnectorOptions options) {
+    public ArangoDBSink(DocumentSerializer<IN> serializer, ArangoDBConnectorOptions options) {
         this.options = options;
         this.serializer = serializer;
         this.clientProvider =
-                MongoColloctionProviders.getBuilder()
+                ArangoDBColloctionProviders.getBuilder()
                         .host(this.options.getHost())
                         .port(this.options.getPort())
                         .user(this.options.getUser())
@@ -89,7 +82,7 @@ public class MongoSink<IN> implements Sink<IN> {
 
     @Override
     public SinkWriter<IN> createWriter(InitContext context) throws IOException {
-        MongoBulkWriter<IN> writer = new MongoBulkWriter<>(clientProvider, serializer, options);
+        ArangoDBBulkWriter<IN> writer = new ArangoDBBulkWriter<>(clientProvider, serializer, options);
         writer.initializeState();
         return writer;
     }

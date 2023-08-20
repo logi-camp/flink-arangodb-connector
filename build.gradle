@@ -18,10 +18,6 @@ repositories {
 
 dependencies {
     compileOnly 'org.apache.flink:flink-connector-base:1.17.1'
-    compileOnly 'com.fasterxml.jackson.core:jackson-core:2.13.3'
-    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-    compileOnly 'org.mongodb:mongodb-driver-sync:4.7.1'
-    compileOnly 'org.mongodb:mongodb-driver-core:4.7.1'
     compileOnly 'org.mongodb:bson:4.7.1'
     compileOnly 'com.google.guava:guava:31.1-jre'
     api 'com.arangodb:arangodb-java-driver:7.1.0'
@@ -34,7 +30,6 @@ dependencies {
     api 'com.arangodb:velocypack:3.0.0'
     api 'com.arangodb:jackson-dataformat-velocypack:4.1.0'
     testImplementation 'junit:junit:4.11'
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:3.4.3'
     testImplementation 'org.apache.flink:flink-clients:1.17.1'
     compileOnly 'org.apache.flink:flink-core:1.17.1'
     compileOnly 'org.apache.flink:flink-streaming-java:1.17.1'

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * DocumentBulk is buffered {@link BaseDocument} in memory, which would be written to MongoDB in a
+ * DocumentBulk is buffered {@link BaseDocument} in memory, which would be written to ArangoDB in a
  * single transaction. Due to execution efficiency, each DocumentBulk maybe be limited to a maximum
  * size, typically 1,000 documents. But for the transactional mode, the maximum size should not be
  * respected because all that data must be written in one transaction.

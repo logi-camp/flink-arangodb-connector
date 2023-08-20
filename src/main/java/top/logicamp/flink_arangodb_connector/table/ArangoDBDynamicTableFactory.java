@@ -10,13 +10,13 @@ import org.apache.flink.table.factories.DynamicTableFactory;
 import org.apache.flink.table.factories.DynamicTableSinkFactory;
 import org.apache.flink.table.factories.FactoryUtil;
 import org.apache.flink.util.Preconditions;
-import top.logicamp.flink_arangodb_connector.config.MongoConnectorOptions;
+import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-public class MongoDynamicTableFactory
+public class ArangoDBDynamicTableFactory
         implements  DynamicTableSinkFactory, DynamicTableFactory {
 
     private static final ConfigOption<String> HOST =
@@ -103,8 +103,8 @@ public class MongoDynamicTableFactory
         } else {
             primaryKeyFieldNames = Collections.emptyList();
         }
-        MongoConnectorOptions mongoSinkOptions = getMongoSinkOptions(options, primaryKeyFieldNames);
-        return new MongoDynamicTableSink(mongoSinkOptions, resolvedSchema);
+        ArangoDBConnectorOptions ArangoDBSinkOptions = getArangoDBSinkOptions(options, primaryKeyFieldNames);
+        return new ArangoDBDynamicTableSink(ArangoDBSinkOptions, resolvedSchema);
     }
 
     @Override
@@ -148,9 +148,9 @@ public class MongoDynamicTableFactory
                 options.get(FLUSH_SIZE) > 0, "`%s` must be greater than 0", FLUSH_SIZE.key());
     }
 
-    private MongoConnectorOptions getMongoSinkOptions(
+    private ArangoDBConnectorOptions getArangoDBSinkOptions(
             ReadableConfig config, List<String> primaryKey) {
-        return MongoConnectorOptions.builder()
+        return ArangoDBConnectorOptions.builder()
                 .withHost(config.get(HOST))
                 .withPort(config.get(PORT))
                 .withUseSsl(config.get(USE_SSL))

@@ -9,9 +9,9 @@
     <artifactId>arangodb-flink-connector</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>mongo-flink</name>
-    <description>MongoFlink is a connector between MongoDB and Apache Flink. </description>
-    <url>http://www.github.com/mongo-flink/mongo-flink</url>
+    <name>arangodb-flink-connector</name>
+    <description>A flink sink connector for ArangoDBs. </description>
+    <url>https://logicamp.top</url>
 
     <licenses>
         <license>
@@ -22,17 +22,17 @@
 
     <developers>
         <developer>
-            <name>Paul Lam</name>
-            <email>paullin3280@gmail.com</email>
-            <organization>MongoFlink</organization>
-            <organizationUrl>https://github.com/mongo-flink</organizationUrl>
+            <name>Mohamad Khani</name>
+            <email>mohamadkhani14@gmail.com</email>
+            <organization>Logicamp</organization>
+            <organizationUrl>https://logicamp.top</organizationUrl>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/mongo-flink/mongo-flink.git</connection>
-        <developerConnection>scm:git:ssh://github.com:mongo-flink/mongo-flink.git</developerConnection>
-        <url>http://github.com/mongo-flink/mongo-flink</url>
+        <connection>scm:git:git://github.com:logi-camp/flink-arangodb-connector.git</connection>
+        <developerConnection>scm:git:git://github.com:logi-camp/flink-arangodb-connector.git</developerConnection>
+        <url>https://logicamp.top</url>
     </scm>
 
     <distributionManagement>
@@ -52,7 +52,6 @@
         <maven.compiler.target>11</maven.compiler.target>
         <flink.version>1.17.1</flink.version>
         <scala.version>2.12</scala.version>
-        <mongo.driver.version>4.7.1</mongo.driver.version>
         <jackson.version>2.13.3</jackson.version>
     </properties>
 
@@ -145,12 +144,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
-            <version>3.4.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -279,7 +272,7 @@
                             <!-- \# refers to the static imports -->
                             <importOrder>
                                 <order>
-                                    top.logicamp.flink_arangodb_connector,org.apache.flink,org.apache.flink.shaded,com.mongodb,,javax,java,\#</order>
+                                    top.logicamp.flink_arangodb_connector,org.apache.flink,org.apache.flink.shaded,,javax,java,\#</order>
                             </importOrder>
                             <removeUnusedImports />
                         </java>

@@ -3,8 +3,8 @@ package top.logicamp.flink_arangodb_connector.config;
 import java.io.Serializable;
 import java.time.Duration;
 
-/** MongoDB connector options. */
-public class MongoConnectorOptions implements Serializable {
+/** ArangoDB connector options. */
+public class ArangoDBConnectorOptions implements Serializable {
 
     private static final long serialVersionUID = 1;
     protected final String host;
@@ -22,7 +22,7 @@ public class MongoConnectorOptions implements Serializable {
     protected final boolean upsertEnable;
     protected final String[] upsertKey;
 
-    public MongoConnectorOptions(
+    public ArangoDBConnectorOptions(
             String host,
             Integer port,
             String database,
@@ -114,7 +114,7 @@ public class MongoConnectorOptions implements Serializable {
         return new Builder();
     }
 
-    /** Builder For {@link MongoConnectorOptions}. */
+    /** Builder For {@link ArangoDBConnectorOptions}. */
     public static class Builder {
         protected String host;
         protected Integer port;
@@ -202,8 +202,8 @@ public class MongoConnectorOptions implements Serializable {
             return this;
         }
 
-        public MongoConnectorOptions build() {
-            return new MongoConnectorOptions(
+        public ArangoDBConnectorOptions build() {
+            return new ArangoDBConnectorOptions(
                     host,
                     port,
                     database,
