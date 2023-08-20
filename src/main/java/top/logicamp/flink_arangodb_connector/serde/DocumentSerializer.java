@@ -13,5 +13,5 @@ public interface DocumentSerializer<T> extends Serializable {
      * @param object The input object.
      * @return The serialized {@link BaseDocument}.
      */
-    BaseDocument serialize(T object);
+    CDCDocument serialize(T object);
 }

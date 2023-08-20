@@ -2,6 +2,7 @@ package top.logicamp.flink_arangodb_connector.sink;
 
 import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
 import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBClientProvider;
+import top.logicamp.flink_arangodb_connector.serde.CDCDocument;
 import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
 
 import org.apache.flink.api.connector.sink2.SinkWriter;
@@ -17,18 +18,19 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
-/** Writer for ArangoDB sink. */
+/**
+ * Writer for ArangoDB sink.
+ */
 public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
     private final ArangoDBClientProvider collectionProvider;
 
     private transient ArangoCollection collection;
 
-    private final ConcurrentLinkedQueue<BaseDocument> currentBulk = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<CDCDocument> currentBulk = new ConcurrentLinkedQueue<CDCDocument>();
 
     private final ArrayBlockingQueue<DocumentBulk> pendingBulks;
 
@@ -181,36 +183,16 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
             DocumentBulk bulk = iterator.next();
             do {
                 try {
-
                     if (bulk.size() > 0) {
-                        List<BaseDocument> documents = bulk.getDocuments();
-                        List<BaseDocument> upserts = new ArrayList<>();
-                        /*for (BaseDocument document : documents) {
-                            List<Bson> filters = new ArrayList<>(upsertKeys.length);
-                            for (String upsertKey : upsertKeys) {
-                                Object o = document.getAttribute(upsertKey);
-                                Bson eq = Filters.eq(upsertKey, o);
-                                filters.add(eq);
-                            }
-                            BaseDocument update = new Document();
-                            update.append("$set", document);
-                            Bson filter = Filters.and(filters);
-                            UpdateOneModel<Document> updateOneModel =
-                                    new UpdateOneModel<>(filter, update, updateOptions);
-                            upserts.add(updateOneModel);
-                        }*/
-                        // TODO bulk write
-                        collection.insertDocuments(documents);
+                        collection.updateDocuments(bulk.getUpdates().collect(Collectors.toList()));
+                        collection.insertDocument(bulk.getInserts().collect(Collectors.toList()));
+                        collection.deleteDocuments(bulk.getDeletes().collect(Collectors.toList()));
                     }
                     iterator.remove();
                     break;
                 } catch (ArangoDBException e) {
                     LOGGER.error("Failed to flush data to ArangoDB ", e);
                 }
-
-                iterator.remove();
-                break;
-
             } while (!closed && retryPolicy.shouldBackoffRetry());
         }
     }

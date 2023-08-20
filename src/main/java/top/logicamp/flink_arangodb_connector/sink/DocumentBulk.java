@@ -1,13 +1,16 @@
 package top.logicamp.flink_arangodb_connector.sink;
 
 import com.arangodb.entity.BaseDocument;
+import org.apache.flink.types.RowKind;
+import top.logicamp.flink_arangodb_connector.serde.CDCDocument;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * DocumentBulk is buffered {@link BaseDocument} in memory, which would be written to ArangoDB in a
@@ -18,7 +21,7 @@ import java.util.Objects;
 @NotThreadSafe
 class DocumentBulk implements Serializable {
 
-    private List<BaseDocument> bufferedDocuments;
+    private final Collection<CDCDocument> bufferedDocuments;
 
     private final long maxSize;
 
@@ -33,7 +36,7 @@ class DocumentBulk implements Serializable {
         this(BUFFER_INIT_SIZE);
     }
 
-    int add(BaseDocument document) {
+    int add(CDCDocument document) {
         if (bufferedDocuments.size() == maxSize) {
             throw new IllegalStateException("DocumentBulk is already full");
         }
@@ -49,8 +52,20 @@ class DocumentBulk implements Serializable {
         return bufferedDocuments.size() >= maxSize;
     }
 
-    List<BaseDocument> getDocuments() {
+    Collection<CDCDocument> getDocuments() {
         return bufferedDocuments;
+    }
+
+    Stream<BaseDocument> getInserts() {
+        return bufferedDocuments.stream().filter((i) -> i.getRowKind() == RowKind.INSERT).map(CDCDocument::getDocument);
+    }
+
+    Stream<BaseDocument> getUpdates() {
+        return bufferedDocuments.stream().filter((i) -> i.getRowKind() == RowKind.UPDATE_AFTER).map(CDCDocument::getDocument);
+    }
+
+    Stream<BaseDocument> getDeletes() {
+        return bufferedDocuments.stream().filter((i) -> i.getRowKind() == RowKind.DELETE).map(CDCDocument::getDocument);
     }
 
     @Override

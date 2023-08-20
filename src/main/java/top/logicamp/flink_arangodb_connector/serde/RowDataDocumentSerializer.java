@@ -26,17 +26,16 @@ public class RowDataDocumentSerializer implements DocumentSerializer<RowData> {
     }
 
     @Override
-    public BaseDocument serialize(RowData row) {
+    public CDCDocument serialize(RowData row) {
         if (node == null) {
             node = new BsonDocument();
         }
         try {
             bsonConverter.convert(node, row);
-            row.getRowKind();
             var doc = new BaseDocument();
             doc.setProperties(new ObjectMapper().readValue(node.toJson(), HashMap.class));
             doc.setKey(doc.getAttribute(primaryKey).toString());
-            return doc;
+            return new CDCDocument(doc, row.getRowKind());
         } catch (JsonProcessingException e) {
             throw new RuntimeException("can not serialize row '" + row + "'. ", e);
         }
