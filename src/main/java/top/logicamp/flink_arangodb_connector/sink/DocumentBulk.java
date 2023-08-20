@@ -9,6 +9,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
 @NotThreadSafe
 class DocumentBulk implements Serializable {
 
-    private final Collection<CDCDocument> bufferedDocuments;
+    private final List<CDCDocument> bufferedDocuments;
 
     private final long maxSize;
 
@@ -61,11 +62,15 @@ class DocumentBulk implements Serializable {
     }
 
     Stream<BaseDocument> getUpdates() {
-        return bufferedDocuments.stream().filter((i) -> i.getRowKind() == RowKind.UPDATE_AFTER).map(CDCDocument::getDocument);
+        return bufferedDocuments.stream().filter((i) -> i.getRowKind() == RowKind.UPDATE_AFTER).map((i)-> {
+            var doc = i.getDocument();
+            doc.addAttribute("_key", doc.getKey());
+            return doc;
+        });
     }
 
-    Stream<BaseDocument> getDeletes() {
-        return bufferedDocuments.stream().filter((i) -> i.getRowKind() == RowKind.DELETE).map(CDCDocument::getDocument);
+    Stream<String> getDeletes() {
+        return bufferedDocuments.stream().filter((i) -> { System.out.println("deletes"+i.getDocument().toString()); return i.getRowKind() == RowKind.DELETE;}).map((i) -> i.getDocument().getKey());
     }
 
     @Override

@@ -117,9 +117,9 @@ public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider 
     }
 
     @Override
-    public ArangoDB recreateClient() {
+    public void recreateClient() {
         close();
-        return getClient();
+        getDefaultCollection();
     }
 
     @Override

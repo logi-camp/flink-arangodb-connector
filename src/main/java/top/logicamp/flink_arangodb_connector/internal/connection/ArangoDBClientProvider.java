@@ -42,7 +42,7 @@ public interface ArangoDBClientProvider extends Serializable {
      *
      * @return A new {@link ArangoDB}.
      */
-    ArangoDB recreateClient();
+    void recreateClient();
 
     /** Close the underlying ArangoDB connection. */
     void close();

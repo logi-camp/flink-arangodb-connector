@@ -57,14 +57,12 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArangoDBBulkWriter.class);
 
     private final boolean upsertEnable;
-    private final String[] upsertKeys;
 
     public ArangoDBBulkWriter(
             ArangoDBClientProvider collectionProvider,
             DocumentSerializer<IN> serializer,
             ArangoDBConnectorOptions options) {
         this.upsertEnable = options.isUpsertEnable();
-        this.upsertKeys = options.getUpsertKey();
         this.collectionProvider = collectionProvider;
         this.serializer = serializer;
         this.maxSize = options.getFlushSize();
@@ -97,12 +95,12 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
 
     public void initializeState() {
         collection = collectionProvider.getDefaultCollection();
-        /* for (DocumentBulk bulk : recoveredBulks) {
-            for (BaseDocument document : bulk.getDocuments()) {
+        /*for (DocumentBulk bulk : recoveredBulks) {
+            for (CDCDocument document : bulk.getDocuments()) {
                 currentBulk.add(document);
                 rollBulkIfNeeded();
             }
-        } */
+        }*/
         initialized = true;
     }
 
@@ -164,7 +162,9 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
                         try {
                             // ordered, non-bypass mode
                             if (bulk.size() > 0) {
-                                collection.insertDocuments(bulk.getDocuments());
+                                collection.insertDocuments(bulk.getInserts().collect(Collectors.toList()));
+                                collection.replaceDocuments(bulk.getUpdates().collect(Collectors.toList()));
+                                collection.deleteDocuments(bulk.getDeletes().collect(Collectors.toList()));
                             }
                             iterator.remove();
                             break;
@@ -184,8 +184,8 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
             do {
                 try {
                     if (bulk.size() > 0) {
-                        collection.updateDocuments(bulk.getUpdates().collect(Collectors.toList()));
-                        collection.insertDocument(bulk.getInserts().collect(Collectors.toList()));
+                        collection.insertDocuments(bulk.getInserts().collect(Collectors.toList()));
+                        collection.replaceDocuments(bulk.getUpdates().collect(Collectors.toList()));
                         collection.deleteDocuments(bulk.getDeletes().collect(Collectors.toList()));
                     }
                     iterator.remove();

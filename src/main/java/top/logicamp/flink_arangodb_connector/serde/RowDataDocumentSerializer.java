@@ -11,7 +11,9 @@ import org.bson.BsonDocument;
 
 import java.util.HashMap;
 
-/** convert rowdata to document. */
+/**
+ * convert rowdata to document.
+ */
 public class RowDataDocumentSerializer implements DocumentSerializer<RowData> {
 
     private final RowDataToBsonConverters.RowDataToBsonConverter bsonConverter;
@@ -31,10 +33,11 @@ public class RowDataDocumentSerializer implements DocumentSerializer<RowData> {
             node = new BsonDocument();
         }
         try {
-            bsonConverter.convert(node, row);
+            bsonConverter.convert(node, row.getRowKind());
             var doc = new BaseDocument();
             doc.setProperties(new ObjectMapper().readValue(node.toJson(), HashMap.class));
             doc.setKey(doc.getAttribute(primaryKey).toString());
+            doc.addAttribute("_key", doc.getAttribute(primaryKey).toString());
             return new CDCDocument(doc, row.getRowKind());
         } catch (JsonProcessingException e) {
             throw new RuntimeException("can not serialize row '" + row + "'. ", e);

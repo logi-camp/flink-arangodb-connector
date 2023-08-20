@@ -85,4 +85,5 @@ public class ArangoDBSink<IN> implements Sink<IN> {
         writer.initializeState();
         return writer;
     }
+
 }
