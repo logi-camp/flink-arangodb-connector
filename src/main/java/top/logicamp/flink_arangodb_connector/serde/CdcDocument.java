@@ -1,4 +1,4 @@
-package top.logicamp.arangodb_flink_connector.bson;
+package top.logicamp.flink_arangodb_connector.serde;
 
 import org.bson.Document;
 

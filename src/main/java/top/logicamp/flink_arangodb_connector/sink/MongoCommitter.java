@@ -1,4 +1,4 @@
-package top.logicamp.arangodb_flink_connector.sink;
+package top.logicamp.flink_arangodb_connector.sink;
 
 import org.apache.flink.api.connector.sink2.Committer;
 
@@ -12,7 +12,7 @@ import com.arangodb.entity.StreamTransactionStatus;
 import com.arangodb.model.StreamTransactionOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.logicamp.arangodb_flink_connector.internal.connection.MongoClientProvider;
+import top.logicamp.flink_arangodb_connector.internal.connection.MongoClientProvider;
 
 import java.io.IOException;
 import java.util.Collection;

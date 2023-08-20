@@ -1,6 +1,6 @@
-package top.logicamp.arangodb_flink_connector.config;
+package top.logicamp.flink_arangodb_connector.config;
 
-import top.logicamp.arangodb_flink_connector.sink.MongoSink;
+import top.logicamp.flink_arangodb_connector.sink.MongoSink;
 
 import java.io.Serializable;
 

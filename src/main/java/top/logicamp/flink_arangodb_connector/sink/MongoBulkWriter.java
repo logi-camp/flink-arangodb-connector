@@ -1,23 +1,16 @@
-package top.logicamp.arangodb_flink_connector.sink;
+package top.logicamp.flink_arangodb_connector.sink;
 
+import com.arangodb.ArangoDBException;
 import org.apache.flink.api.connector.sink2.SinkWriter;
 import org.apache.flink.util.concurrent.ExecutorThreadFactory;
 
-import com.mongodb.MongoException;
-import com.mongodb.client.model.BulkWriteOptions;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.UpdateOneModel;
-import com.mongodb.client.model.UpdateOptions;
-
 import com.arangodb.ArangoCollection;
 import com.arangodb.entity.BaseDocument;
-import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.logicamp.arangodb_flink_connector.config.MongoConnectorOptions;
-import top.logicamp.arangodb_flink_connector.internal.connection.MongoClientProvider;
-import top.logicamp.arangodb_flink_connector.serde.DocumentSerializer;
+import top.logicamp.flink_arangodb_connector.config.MongoConnectorOptions;
+import top.logicamp.flink_arangodb_connector.internal.connection.MongoClientProvider;
+import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -28,7 +21,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 
-/** Writer for MongoDB sink. */
+/**
+ * Writer for MongoDB sink.
+ */
 public class MongoBulkWriter<IN> implements SinkWriter<IN> {
     private final MongoClientProvider collectionProvider;
 
@@ -172,7 +167,7 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN> {
                             }
                             iterator.remove();
                             break;
-                        } catch (MongoException e) {
+                        } catch (Exception e) {
                             // maybe partial failure
                             LOGGER.error("Failed to flush data to MongoDB", e);
                         }
@@ -183,41 +178,40 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN> {
     }
 
     private void flushUpsert(Iterator<DocumentBulk> iterator) {
-        UpdateOptions updateOptions = new UpdateOptions();
-        updateOptions.upsert(true);
-        BulkWriteOptions bulkWriteOptions = new BulkWriteOptions();
-        bulkWriteOptions.ordered(true);
         while (iterator.hasNext()) {
             DocumentBulk bulk = iterator.next();
             do {
                 try {
+
                     if (bulk.size() > 0) {
                         List<BaseDocument> documents = bulk.getDocuments();
-                        List<UpdateOneModel<Document>> upserts = new ArrayList<>();
-                        for (BaseDocument document : documents) {
+                        List<BaseDocument> upserts = new ArrayList<>();
+                        /*for (BaseDocument document : documents) {
                             List<Bson> filters = new ArrayList<>(upsertKeys.length);
                             for (String upsertKey : upsertKeys) {
                                 Object o = document.getAttribute(upsertKey);
                                 Bson eq = Filters.eq(upsertKey, o);
                                 filters.add(eq);
                             }
-                            Document update = new Document();
+                            BaseDocument update = new Document();
                             update.append("$set", document);
                             Bson filter = Filters.and(filters);
                             UpdateOneModel<Document> updateOneModel =
                                     new UpdateOneModel<>(filter, update, updateOptions);
                             upserts.add(updateOneModel);
-                        }
+                        }*/
                         // TODO bulk write
-                        collection.insertDocument(documents);
+                        collection.insertDocuments(documents);
                     }
-
                     iterator.remove();
                     break;
-                } catch (MongoException e) {
-                    // maybe partial failure
-                    LOGGER.error("Failed to flush data to MongoDB", e);
+                } catch (ArangoDBException e) {
+                    LOGGER.error("Failed to flush data to ArangoDB ", e);
                 }
+
+                iterator.remove();
+                break;
+
             } while (!closed && retryPolicy.shouldBackoffRetry());
         }
     }
@@ -225,7 +219,7 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN> {
     private void ensureConnection() {
         try {
             collection.getInfo();
-        } catch (MongoException e) {
+        } catch (Exception e) {
             LOGGER.warn("Connection is not available, try to reconnect", e);
             collectionProvider.recreateClient();
         }
@@ -320,7 +314,6 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN> {
 
     @Override
     public void flush(boolean endOfInput) throws IOException, InterruptedException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'flush'");
+        flush();
     }
 }

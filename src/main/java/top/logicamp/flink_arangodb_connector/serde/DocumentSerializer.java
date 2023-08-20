@@ -1,4 +1,4 @@
-package top.logicamp.arangodb_flink_connector.serde;
+package top.logicamp.flink_arangodb_connector.serde;
 
 import com.arangodb.entity.BaseDocument;
 

@@ -1,20 +1,9 @@
-package top.logicamp.arangodb_flink_connector.serde;
+package top.logicamp.flink_arangodb_connector.serde;
 
 import org.apache.flink.table.data.*;
 import org.apache.flink.table.types.logical.*;
 
-import org.bson.BsonArray;
-import org.bson.BsonBinary;
-import org.bson.BsonBoolean;
-import org.bson.BsonDateTime;
-import org.bson.BsonDecimal128;
-import org.bson.BsonDocument;
-import org.bson.BsonDouble;
-import org.bson.BsonInt32;
-import org.bson.BsonInt64;
-import org.bson.BsonNull;
-import org.bson.BsonString;
-import org.bson.BsonValue;
+import org.bson.*;
 import org.bson.types.Decimal128;
 
 import java.io.Serializable;

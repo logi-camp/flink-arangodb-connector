@@ -1,14 +1,14 @@
-package top.logicamp.arangodb_flink_connector.sink;
+package top.logicamp.flink_arangodb_connector.sink;
 
 import org.apache.flink.api.connector.sink2.Sink;
 import org.apache.flink.api.connector.sink2.SinkWriter;
 
-import top.logicamp.arangodb_flink_connector.config.MongoConnectorOptions;
-import top.logicamp.arangodb_flink_connector.config.SinkConfiguration;
-import top.logicamp.arangodb_flink_connector.config.SinkConfigurationFactory;
-import top.logicamp.arangodb_flink_connector.internal.connection.MongoClientProvider;
-import top.logicamp.arangodb_flink_connector.internal.connection.MongoColloctionProviders;
-import top.logicamp.arangodb_flink_connector.serde.DocumentSerializer;
+import top.logicamp.flink_arangodb_connector.config.MongoConnectorOptions;
+import top.logicamp.flink_arangodb_connector.config.SinkConfiguration;
+import top.logicamp.flink_arangodb_connector.config.SinkConfigurationFactory;
+import top.logicamp.flink_arangodb_connector.internal.connection.MongoClientProvider;
+import top.logicamp.flink_arangodb_connector.internal.connection.MongoColloctionProviders;
+import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -38,6 +38,9 @@ public class MongoSink<IN> implements Sink<IN> {
             Integer port,
             String database,
             String collection,
+            String user,
+            String password,
+            Boolean useSsl,
             DocumentSerializer<IN> serializer,
             Properties properties) {
         SinkConfiguration sinkConfiguration = SinkConfigurationFactory.fromProperties(properties);
@@ -48,12 +51,19 @@ public class MongoSink<IN> implements Sink<IN> {
                         .port(port)
                         .database(database)
                         .collection(collection)
+                        .user(user)
+                        .password(password)
+                        .useSsl(useSsl)
                         .build();
         this.options =
                 MongoConnectorOptions.builder()
                         .withDatabase(database)
                         .withCollection(collection)
-                        .withConnectString(host, port)
+                        .withHost(host)
+                        .withPort(port)
+                        .withPassword(password)
+                        .withUser(user)
+                        .withUseSsl(useSsl)
                         .withTransactionEnable(sinkConfiguration.isTransactional())
                         .withFlushOnCheckpoint(sinkConfiguration.isFlushOnCheckpoint())
                         .withFlushSize((int) sinkConfiguration.getBulkFlushSize())
@@ -69,6 +79,9 @@ public class MongoSink<IN> implements Sink<IN> {
                 MongoColloctionProviders.getBuilder()
                         .host(this.options.getHost())
                         .port(this.options.getPort())
+                        .user(this.options.getUser())
+                        .password(this.options.getPassword())
+                        .useSsl(this.options.getUseSsl())
                         .database(this.options.getDatabase())
                         .collection(this.options.getCollection())
                         .build();

@@ -1,4 +1,4 @@
-package top.logicamp.arangodb_flink_connector.config;
+package top.logicamp.flink_arangodb_connector.config;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -8,9 +8,12 @@ public class MongoConnectorOptions implements Serializable {
 
     private static final long serialVersionUID = 1;
     protected final String host;
+    protected final Integer port;
     protected final String database;
     protected final String collection;
-
+    protected final String user;
+    protected final String password;
+    protected final Boolean useSsl;
     protected final boolean transactionEnable;
     protected final boolean flushOnCheckpoint;
     protected final int flushSize;
@@ -18,13 +21,15 @@ public class MongoConnectorOptions implements Serializable {
     protected final int maxInFlightFlushes;
     protected final boolean upsertEnable;
     protected final String[] upsertKey;
-    protected final Integer port;
 
     public MongoConnectorOptions(
             String host,
             Integer port,
             String database,
             String collection,
+            String password,
+            String user,
+            Boolean useSsl,
             boolean transactionEnable,
             boolean flushOnCheckpoint,
             int flushSize,
@@ -36,6 +41,9 @@ public class MongoConnectorOptions implements Serializable {
         this.port = port;
         this.database = database;
         this.collection = collection;
+        this.password = password;
+        this.user = user;
+        this.useSsl = useSsl;
         this.transactionEnable = transactionEnable;
         this.flushOnCheckpoint = flushOnCheckpoint;
         this.flushSize = flushSize;
@@ -60,6 +68,19 @@ public class MongoConnectorOptions implements Serializable {
     public String getCollection() {
         return collection;
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public Boolean getUseSsl() {
+        return useSsl;
+    }
+
 
     public boolean isTransactionEnable() {
         return transactionEnable;
@@ -99,6 +120,9 @@ public class MongoConnectorOptions implements Serializable {
         protected Integer port;
         protected String database;
         protected String collection;
+        protected String password;
+        protected String user;
+        protected Boolean useSsl;
 
         protected boolean transactionEnable;
         protected boolean flushOnCheckpoint;
@@ -108,8 +132,12 @@ public class MongoConnectorOptions implements Serializable {
         protected boolean upsertEnable;
         protected String[] upsertKey;
 
-        public Builder withConnectString(String host, Integer port) {
+        public Builder withHost(String host) {
             this.host = host;
+            return this;
+        }
+
+        public Builder withPort(Integer port){
             this.port = port;
             return this;
         }
@@ -159,12 +187,30 @@ public class MongoConnectorOptions implements Serializable {
             return this;
         }
 
+        public Builder withPassword(String password){
+            this.password = password;
+            return this;
+        }
+
+        public Builder withUser(String user){
+            this.user = user;
+            return this;
+        }
+
+        public Builder withUseSsl(Boolean useSsl){
+            this.useSsl = useSsl;
+            return this;
+        }
+
         public MongoConnectorOptions build() {
             return new MongoConnectorOptions(
                     host,
                     port,
                     database,
                     collection,
+                    password,
+                    user,
+                    useSsl,
                     transactionEnable,
                     flushOnCheckpoint,
                     flushSize,

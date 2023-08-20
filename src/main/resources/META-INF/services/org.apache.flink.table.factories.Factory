@@ -1,1 +1,1 @@
-org.mongoflink.table.MongoDynamicTableFactory
+top.logicamp.flink_arangodb_connector.table.MongoDynamicTableFactory

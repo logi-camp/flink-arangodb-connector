@@ -1,4 +1,4 @@
-package top.logicamp.arangodb_flink_connector.internal.connection;
+package top.logicamp.flink_arangodb_connector.internal.connection;
 
 import org.apache.flink.util.Preconditions;
 
@@ -16,7 +16,12 @@ public class MongoSingleCollectionProvider implements MongoClientProvider {
 
     private final Integer port;
 
-    /** The MongoDB defaultDatabase to write to. */
+    private final String password;
+
+    private final String user;
+    private Boolean useSsl;
+
+    /** The ArangoDB defaultDatabase to write to. */
     private final String defaultDatabase;
 
     /**
@@ -35,22 +40,35 @@ public class MongoSingleCollectionProvider implements MongoClientProvider {
             LoggerFactory.getLogger(MongoSingleCollectionProvider.class);
 
     public MongoSingleCollectionProvider(
-            String host, Integer port, String defaultDatabase, String defaultCollection) {
+            String host, Integer port, String defaultDatabase, String defaultCollection, String password, String user, Boolean useSsl) {
         Preconditions.checkNotNull(host);
         Preconditions.checkNotNull(port);
         Preconditions.checkNotNull(defaultDatabase);
         Preconditions.checkNotNull(defaultCollection);
         this.host = host;
         this.port = port;
+        this.useSsl = useSsl;
         this.defaultDatabase = defaultDatabase;
         this.defaultCollection = defaultCollection;
+        this.user = user;
+        this.password = password;
     }
 
     @Override
     public ArangoDB getClient() {
         synchronized (this) {
             if (client == null) {
-                client = new ArangoDB.Builder().host(host, port).build();
+                var builder = new ArangoDB.Builder().host(host, port);
+                if(password != null){
+                    builder.password(password);
+                }
+                if(user != null){
+                    builder.user(user);
+                }
+                if(useSsl != null){
+                    builder.useSsl(useSsl);
+                }
+                client = builder.build();
             }
         }
         return client;
@@ -94,7 +112,7 @@ public class MongoSingleCollectionProvider implements MongoClientProvider {
                 client.shutdown();
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to close Mongo client", e);
+            LOGGER.error("Failed to close ArangoDB client", e);
         } finally {
             client = null;
         }

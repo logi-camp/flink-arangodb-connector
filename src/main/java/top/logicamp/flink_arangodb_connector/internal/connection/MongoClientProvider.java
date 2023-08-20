@@ -1,4 +1,4 @@
-package top.logicamp.arangodb_flink_connector.internal.connection;
+package top.logicamp.flink_arangodb_connector.internal.connection;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;

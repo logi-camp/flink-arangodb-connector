@@ -1,4 +1,4 @@
-package top.logicamp.arangodb_flink_connector.sink;
+package top.logicamp.flink_arangodb_connector.sink;
 
 import com.mongodb.client.TransactionBody;
 
