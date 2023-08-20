@@ -81,7 +81,6 @@ public class ArangoDBConnectorOptions implements Serializable {
         return useSsl;
     }
 
-
     public boolean isTransactionEnable() {
         return transactionEnable;
     }
@@ -137,7 +136,7 @@ public class ArangoDBConnectorOptions implements Serializable {
             return this;
         }
 
-        public Builder withPort(Integer port){
+        public Builder withPort(Integer port) {
             this.port = port;
             return this;
         }
@@ -187,17 +186,17 @@ public class ArangoDBConnectorOptions implements Serializable {
             return this;
         }
 
-        public Builder withPassword(String password){
+        public Builder withPassword(String password) {
             this.password = password;
             return this;
         }
 
-        public Builder withUser(String user){
+        public Builder withUser(String user) {
             this.user = user;
             return this;
         }
 
-        public Builder withUseSsl(Boolean useSsl){
+        public Builder withUseSsl(Boolean useSsl) {
             this.useSsl = useSsl;
             return this;
         }

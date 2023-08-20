@@ -1,16 +1,16 @@
 package top.logicamp.flink_arangodb_connector.table;
 
+import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
+import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
+import top.logicamp.flink_arangodb_connector.serde.RowDataDocumentSerializer;
+import top.logicamp.flink_arangodb_connector.sink.ArangoDBSink;
+
 import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.connector.ChangelogMode;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
 import org.apache.flink.table.connector.sink.SinkV2Provider;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.types.RowKind;
-
-import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
-import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
-import top.logicamp.flink_arangodb_connector.serde.RowDataDocumentSerializer;
-import top.logicamp.flink_arangodb_connector.sink.ArangoDBSink;
 
 public class ArangoDBDynamicTableSink implements DynamicTableSink {
 
@@ -19,9 +19,13 @@ public class ArangoDBDynamicTableSink implements DynamicTableSink {
     private final DocumentSerializer<RowData> serializer;
     private final ArangoDBConnectorOptions options;
 
-    public ArangoDBDynamicTableSink(ArangoDBConnectorOptions options, ResolvedSchema resolvedSchema) {
+    public ArangoDBDynamicTableSink(
+            ArangoDBConnectorOptions options, ResolvedSchema resolvedSchema) {
         this.tableSchema = resolvedSchema;
-        serializer = new RowDataDocumentSerializer(resolvedSchema.toPhysicalRowDataType().getLogicalType(), resolvedSchema.getPrimaryKey().get().getColumns().get(0));
+        serializer =
+                new RowDataDocumentSerializer(
+                        resolvedSchema.toPhysicalRowDataType().getLogicalType(),
+                        resolvedSchema.getPrimaryKey().get().getColumns().get(0));
         this.options = options;
     }
 

@@ -19,7 +19,6 @@ public class ArangoDBColloctionProviders {
         private String password;
         private Boolean useSsl;
 
-
         public Builder host(String host) {
             this.host = host;
             return this;
@@ -40,17 +39,17 @@ public class ArangoDBColloctionProviders {
             return this;
         }
 
-        public Builder user(String user){
+        public Builder user(String user) {
             this.user = user;
             return this;
         }
 
-        public Builder password(String password){
+        public Builder password(String password) {
             this.password = password;
             return this;
         }
 
-        public Builder useSsl(Boolean useSsl){
+        public Builder useSsl(Boolean useSsl) {
             this.useSsl = useSsl;
             return this;
         }
@@ -60,7 +59,8 @@ public class ArangoDBColloctionProviders {
             Preconditions.checkNotNull(port, "Port must not be null");
             Preconditions.checkNotNull(database, "Database must not be null");
             Preconditions.checkNotNull(collection, "Collection must not be null");
-            return new ArangoDBSingleCollectionProvider(host, port, database, collection, password, user, useSsl);
+            return new ArangoDBSingleCollectionProvider(
+                    host, port, database, collection, password, user, useSsl);
         }
     }
 }

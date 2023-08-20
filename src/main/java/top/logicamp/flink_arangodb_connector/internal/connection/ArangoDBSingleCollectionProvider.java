@@ -24,9 +24,7 @@ public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider 
     /** The ArangoDB defaultDatabase to write to. */
     private final String defaultDatabase;
 
-    /**
-     * The defaultCollection to write to.
-     */
+    /** The defaultCollection to write to. */
     private final String defaultCollection;
 
     private transient ArangoDB client;
@@ -39,7 +37,13 @@ public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider 
             LoggerFactory.getLogger(ArangoDBSingleCollectionProvider.class);
 
     public ArangoDBSingleCollectionProvider(
-            String host, Integer port, String defaultDatabase, String defaultCollection, String password, String user, Boolean useSsl) {
+            String host,
+            Integer port,
+            String defaultDatabase,
+            String defaultCollection,
+            String password,
+            String user,
+            Boolean useSsl) {
         Preconditions.checkNotNull(host);
         Preconditions.checkNotNull(port);
         Preconditions.checkNotNull(defaultDatabase);
@@ -58,13 +62,13 @@ public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider 
         synchronized (this) {
             if (client == null) {
                 var builder = new ArangoDB.Builder().host(host, port);
-                if(password != null){
+                if (password != null) {
                     builder.password(password);
                 }
-                if(user != null){
+                if (user != null) {
                     builder.user(user);
                 }
-                if(useSsl != null){
+                if (useSsl != null) {
                     builder.useSsl(useSsl);
                 }
                 client = builder.build();

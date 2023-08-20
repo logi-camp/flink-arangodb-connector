@@ -34,7 +34,7 @@ Use ArangoDBSink in your Flink DataStream application.
 		.withCollection("my_collection")
 		.withHost("127.0.0.1")
 		.withPort("8529")
-        .withUseSsl("true")
+		.withUseSsl("true")
 		.build();
 
 	env.addSource(...)

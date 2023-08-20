@@ -1,8 +1,5 @@
 package top.logicamp.flink_arangodb_connector.sink;
 
-import org.apache.flink.api.connector.sink2.Sink;
-import org.apache.flink.api.connector.sink2.SinkWriter;
-
 import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
 import top.logicamp.flink_arangodb_connector.config.SinkConfiguration;
 import top.logicamp.flink_arangodb_connector.config.SinkConfigurationFactory;
@@ -10,13 +7,14 @@ import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBClientP
 import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBColloctionProviders;
 import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
 
+import org.apache.flink.api.connector.sink2.Sink;
+import org.apache.flink.api.connector.sink2.SinkWriter;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Properties;
 
-/**
- * Flink sink connector for ArangoDB.
- */
+/** Flink sink connector for ArangoDB. */
 public class ArangoDBSink<IN> implements Sink<IN> {
 
     private final ArangoDBClientProvider clientProvider;
@@ -82,7 +80,8 @@ public class ArangoDBSink<IN> implements Sink<IN> {
 
     @Override
     public SinkWriter<IN> createWriter(InitContext context) throws IOException {
-        ArangoDBBulkWriter<IN> writer = new ArangoDBBulkWriter<>(clientProvider, serializer, options);
+        ArangoDBBulkWriter<IN> writer =
+                new ArangoDBBulkWriter<>(clientProvider, serializer, options);
         writer.initializeState();
         return writer;
     }

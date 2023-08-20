@@ -1,16 +1,17 @@
 package top.logicamp.flink_arangodb_connector.sink;
 
-import com.arangodb.ArangoDBException;
+import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
+import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBClientProvider;
+import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
+
 import org.apache.flink.api.connector.sink2.SinkWriter;
 import org.apache.flink.util.concurrent.ExecutorThreadFactory;
 
 import com.arangodb.ArangoCollection;
+import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
-import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBClientProvider;
-import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -21,9 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 
-/**
- * Writer for ArangoDB sink.
- */
+/** Writer for ArangoDB sink. */
 public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
     private final ArangoDBClientProvider collectionProvider;
 
@@ -146,8 +145,8 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
      * tries. There may be concurrent flushes when concurrent checkpoints are enabled.
      *
      * <p>We manually retry write operations, because the driver doesn't support automatic retries
-     * for some ArangoDB setups (e.g. standalone instances). TODO: This should be configurable in the
-     * future.
+     * for some ArangoDB setups (e.g. standalone instances). TODO: This should be configurable in
+     * the future.
      */
     private synchronized void flush() {
         if (!closed) {

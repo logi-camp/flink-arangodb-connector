@@ -197,6 +197,11 @@
             <artifactId>jackson-dataformat-velocypack</artifactId>
             <version>4.1.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>bson</artifactId>
+            <version>4.7.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -248,7 +253,7 @@
                 <plugin>
                     <groupId>com.diffplug.spotless</groupId>
                     <artifactId>spotless-maven-plugin</artifactId>
-                    <version>2.13.0</version>
+                    <version>2.38.0</version>
                     <configuration>
                         <formats>
                             <format>
@@ -266,7 +271,7 @@
                         </formats>
                         <java>
                             <googleJavaFormat>
-                                <version>11</version>
+                                <version>1.17.0</version>
                                 <style>AOSP</style>
                             </googleJavaFormat>
                             <!-- \# refers to the static imports -->
@@ -325,17 +330,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.7</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

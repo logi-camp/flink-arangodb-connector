@@ -1,5 +1,7 @@
 package top.logicamp.flink_arangodb_connector.table;
 
+import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
+
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;
 import org.apache.flink.configuration.ReadableConfig;
@@ -10,14 +12,12 @@ import org.apache.flink.table.factories.DynamicTableFactory;
 import org.apache.flink.table.factories.DynamicTableSinkFactory;
 import org.apache.flink.table.factories.FactoryUtil;
 import org.apache.flink.util.Preconditions;
-import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-public class ArangoDBDynamicTableFactory
-        implements  DynamicTableSinkFactory, DynamicTableFactory {
+public class ArangoDBDynamicTableFactory implements DynamicTableSinkFactory, DynamicTableFactory {
 
     private static final ConfigOption<String> HOST =
             ConfigOptions.key("host")
@@ -103,7 +103,8 @@ public class ArangoDBDynamicTableFactory
         } else {
             primaryKeyFieldNames = Collections.emptyList();
         }
-        ArangoDBConnectorOptions ArangoDBSinkOptions = getArangoDBSinkOptions(options, primaryKeyFieldNames);
+        ArangoDBConnectorOptions ArangoDBSinkOptions =
+                getArangoDBSinkOptions(options, primaryKeyFieldNames);
         return new ArangoDBDynamicTableSink(ArangoDBSinkOptions, resolvedSchema);
     }
 
