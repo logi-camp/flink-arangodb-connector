@@ -1,5 +1,7 @@
 # Flink ArangoDB Connector
 
+> This repository is under heavy development. Please don't use this in production mode.
+
 # Start to use
 ## Prerequisite
 
