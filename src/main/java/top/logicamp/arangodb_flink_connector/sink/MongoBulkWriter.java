@@ -1,15 +1,16 @@
 package top.logicamp.arangodb_flink_connector.sink;
 
-import org.apache.flink.api.connector.sink.SinkWriter;
+import org.apache.flink.api.connector.sink2.SinkWriter;
 import org.apache.flink.util.concurrent.ExecutorThreadFactory;
 
 import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.UpdateOptions;
 
+import com.arangodb.ArangoCollection;
+import com.arangodb.entity.BaseDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -28,13 +29,12 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /** Writer for MongoDB sink. */
-public class MongoBulkWriter<IN> implements SinkWriter<IN, DocumentBulk, DocumentBulk> {
-
+public class MongoBulkWriter<IN> implements SinkWriter<IN> {
     private final MongoClientProvider collectionProvider;
 
-    private transient MongoCollection<Document> collection;
+    private transient ArangoCollection collection;
 
-    private final ConcurrentLinkedQueue<Document> currentBulk = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<BaseDocument> currentBulk = new ConcurrentLinkedQueue<>();
 
     private final ArrayBlockingQueue<DocumentBulk> pendingBulks;
 
@@ -99,14 +99,14 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN, DocumentBulk, Documen
         }
     }
 
-    public void initializeState(List<DocumentBulk> recoveredBulks) {
+    public void initializeState() {
         collection = collectionProvider.getDefaultCollection();
-        for (DocumentBulk bulk : recoveredBulks) {
-            for (Document document : bulk.getDocuments()) {
+        /* for (DocumentBulk bulk : recoveredBulks) {
+            for (BaseDocument document : bulk.getDocuments()) {
                 currentBulk.add(document);
                 rollBulkIfNeeded();
             }
-        }
+        } */
         initialized = true;
     }
 
@@ -115,30 +115,6 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN, DocumentBulk, Documen
         checkFlushException();
         currentBulk.add(serializer.serialize(o));
         rollBulkIfNeeded();
-    }
-
-    @Override
-    public List<DocumentBulk> prepareCommit(boolean flush) throws IOException {
-        if (flushOnCheckpoint || flush) {
-            rollBulkIfNeeded(true);
-        }
-        return new ArrayList<>(pendingBulks);
-    }
-
-    @Override
-    public List<DocumentBulk> snapshotState() throws IOException {
-        List<DocumentBulk> inProgressAndPendingBulks = new ArrayList<>(1);
-
-        synchronized (this) {
-            DocumentBulk bulk = new DocumentBulk();
-            for (Document document : currentBulk) {
-                bulk.add(document);
-            }
-            inProgressAndPendingBulks.add(bulk);
-            inProgressAndPendingBulks.addAll(pendingBulks);
-            pendingBulks.clear();
-        }
-        return inProgressAndPendingBulks;
     }
 
     @Override
@@ -192,7 +168,7 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN, DocumentBulk, Documen
                         try {
                             // ordered, non-bypass mode
                             if (bulk.size() > 0) {
-                                collection.insertMany(bulk.getDocuments());
+                                collection.insertDocuments(bulk.getDocuments());
                             }
                             iterator.remove();
                             break;
@@ -216,12 +192,12 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN, DocumentBulk, Documen
             do {
                 try {
                     if (bulk.size() > 0) {
-                        List<Document> documents = bulk.getDocuments();
+                        List<BaseDocument> documents = bulk.getDocuments();
                         List<UpdateOneModel<Document>> upserts = new ArrayList<>();
-                        for (Document document : documents) {
+                        for (BaseDocument document : documents) {
                             List<Bson> filters = new ArrayList<>(upsertKeys.length);
                             for (String upsertKey : upsertKeys) {
-                                Object o = document.get(upsertKey);
+                                Object o = document.getAttribute(upsertKey);
                                 Bson eq = Filters.eq(upsertKey, o);
                                 filters.add(eq);
                             }
@@ -232,7 +208,8 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN, DocumentBulk, Documen
                                     new UpdateOneModel<>(filter, update, updateOptions);
                             upserts.add(updateOneModel);
                         }
-                        collection.bulkWrite(upserts, bulkWriteOptions);
+                        // TODO bulk write
+                        collection.insertDocument(documents);
                     }
 
                     iterator.remove();
@@ -247,7 +224,7 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN, DocumentBulk, Documen
 
     private void ensureConnection() {
         try {
-            collection.listIndexes();
+            collection.getInfo();
         } catch (MongoException e) {
             LOGGER.warn("Connection is not available, try to reconnect", e);
             collectionProvider.recreateClient();
@@ -339,5 +316,11 @@ public class MongoBulkWriter<IN> implements SinkWriter<IN, DocumentBulk, Documen
         void reset() {
             currentRetries = 0L;
         }
+    }
+
+    @Override
+    public void flush(boolean endOfInput) throws IOException, InterruptedException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'flush'");
     }
 }

@@ -3,7 +3,7 @@ package top.logicamp.arangodb_flink_connector.table;
 import org.apache.flink.table.catalog.ResolvedSchema;
 import org.apache.flink.table.connector.ChangelogMode;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
-import org.apache.flink.table.connector.sink.SinkProvider;
+import org.apache.flink.table.connector.sink.SinkV2Provider;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.types.RowKind;
 
@@ -21,8 +21,7 @@ public class MongoDynamicTableSink implements DynamicTableSink {
 
     public MongoDynamicTableSink(MongoConnectorOptions options, ResolvedSchema resolvedSchema) {
         this.tableSchema = resolvedSchema;
-        serializer =
-                new RowDataDocumentSerializer(tableSchema.toPhysicalRowDataType().getLogicalType());
+        serializer = new RowDataDocumentSerializer();
         this.options = options;
     }
 
@@ -37,7 +36,7 @@ public class MongoDynamicTableSink implements DynamicTableSink {
 
     @Override
     public SinkRuntimeProvider getSinkRuntimeProvider(Context context) {
-        return SinkProvider.of(new MongoSink<>(serializer, options));
+        return SinkV2Provider.of(new MongoSink<>(serializer, options));
     }
 
     @Override

@@ -1,9 +1,11 @@
 package top.logicamp.arangodb_flink_connector.sink;
 
+import com.mongodb.client.TransactionBody;
+
 import com.arangodb.ArangoCollection;
 import com.arangodb.entity.BaseDocument;
+import com.arangodb.entity.DocumentCreateEntity;
 import com.arangodb.entity.MultiDocumentEntity;
-import com.mongodb.client.TransactionBody;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,8 +27,9 @@ public class CommittableTransaction implements TransactionBody<Integer>, Seriali
 
     @Override
     public Integer execute() {
-        MultiDocumentEntity result = collection.insertDocuments(bufferedDocuments);
-        //TODO Verify that is act like original Mongo connector
+        MultiDocumentEntity<DocumentCreateEntity<Void>> result =
+                collection.insertDocuments(bufferedDocuments);
+        // TODO Verify that is act like original Mongo connector
         return result.getDocuments().size();
     }
 }

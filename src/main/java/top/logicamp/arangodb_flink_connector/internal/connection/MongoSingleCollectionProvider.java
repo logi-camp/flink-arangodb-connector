@@ -5,26 +5,22 @@ import org.apache.flink.util.Preconditions;
 import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDatabase;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A simple implementation of {@link MongoClientProvider}. */
 public class MongoSingleCollectionProvider implements MongoClientProvider {
 
-    /**
-     * Connection string to MongoDB standalone instances, replica sets or sharded
-     * clusters.
-     */
+    /** Connection string to MongoDB standalone instances, replica sets or sharded clusters. */
     private final String host;
+
     private final Integer port;
 
     /** The MongoDB defaultDatabase to write to. */
     private final String defaultDatabase;
 
     /**
-     * The defaultCollection to write to. Must be a existing defaultCollection for
-     * MongoDB 4.2 and
+     * The defaultCollection to write to. Must be a existing defaultCollection for MongoDB 4.2 and
      * earlier versions.
      */
     private final String defaultCollection;
@@ -35,7 +31,8 @@ public class MongoSingleCollectionProvider implements MongoClientProvider {
 
     private transient ArangoCollection collection;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MongoSingleCollectionProvider.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(MongoSingleCollectionProvider.class);
 
     public MongoSingleCollectionProvider(
             String host, Integer port, String defaultDatabase, String defaultCollection) {
@@ -77,6 +74,11 @@ public class MongoSingleCollectionProvider implements MongoClientProvider {
             }
         }
         return collection;
+    }
+
+    @Override
+    public String getDefaultCollectionName() {
+        return defaultCollection;
     }
 
     @Override

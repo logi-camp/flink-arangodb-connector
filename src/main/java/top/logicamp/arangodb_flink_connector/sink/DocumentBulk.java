@@ -1,6 +1,6 @@
 package top.logicamp.arangodb_flink_connector.sink;
 
-import org.bson.Document;
+import com.arangodb.entity.BaseDocument;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * DocumentBulk is buffered {@link Document} in memory, which would be written to MongoDB in a
+ * DocumentBulk is buffered {@link BaseDocument} in memory, which would be written to MongoDB in a
  * single transaction. Due to execution efficiency, each DocumentBulk maybe be limited to a maximum
  * size, typically 1,000 documents. But for the transactional mode, the maximum size should not be
  * respected because all that data must be written in one transaction.
@@ -18,7 +18,7 @@ import java.util.Objects;
 @NotThreadSafe
 class DocumentBulk implements Serializable {
 
-    private List<Document> bufferedDocuments;
+    private List<BaseDocument> bufferedDocuments;
 
     private final long maxSize;
 
@@ -33,7 +33,7 @@ class DocumentBulk implements Serializable {
         this(BUFFER_INIT_SIZE);
     }
 
-    int add(Document document) {
+    int add(BaseDocument document) {
         if (bufferedDocuments.size() == maxSize) {
             throw new IllegalStateException("DocumentBulk is already full");
         }
@@ -49,7 +49,7 @@ class DocumentBulk implements Serializable {
         return bufferedDocuments.size() >= maxSize;
     }
 
-    List<Document> getDocuments() {
+    List<BaseDocument> getDocuments() {
         return bufferedDocuments;
     }
 

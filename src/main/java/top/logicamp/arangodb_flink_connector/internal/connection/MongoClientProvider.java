@@ -1,11 +1,12 @@
 package top.logicamp.arangodb_flink_connector.internal.connection;
 
-import com.arangodb.ArangoCollection;
-import com.arangodb.ArangoDB;
-import com.arangodb.ArangoDatabase;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+
+import com.arangodb.ArangoCollection;
+import com.arangodb.ArangoDB;
+import com.arangodb.ArangoDatabase;
 
 import java.io.Serializable;
 
@@ -32,6 +33,13 @@ public interface MongoClientProvider extends Serializable {
      * @return Current {@link MongoCollection}.
      */
     ArangoCollection getDefaultCollection();
+
+    /**
+     * Get the default collection name.
+     *
+     * @return Current {@link String}.
+     */
+    String getDefaultCollectionName();
 
     /**
      * Recreate a client. Used typically when a connection is timed out or lost.

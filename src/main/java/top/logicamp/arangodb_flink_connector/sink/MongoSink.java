@@ -1,10 +1,7 @@
 package top.logicamp.arangodb_flink_connector.sink;
 
-import org.apache.flink.api.connector.sink.Committer;
-import org.apache.flink.api.connector.sink.GlobalCommitter;
-import org.apache.flink.api.connector.sink.Sink;
-import org.apache.flink.api.connector.sink.SinkWriter;
-import org.apache.flink.core.io.SimpleVersionedSerializer;
+import org.apache.flink.api.connector.sink2.Sink;
+import org.apache.flink.api.connector.sink2.SinkWriter;
 
 import top.logicamp.arangodb_flink_connector.config.MongoConnectorOptions;
 import top.logicamp.arangodb_flink_connector.config.SinkConfiguration;
@@ -15,8 +12,6 @@ import top.logicamp.arangodb_flink_connector.serde.DocumentSerializer;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -29,7 +24,7 @@ import java.util.Properties;
  * <p>In non-transaction mode, writes would be periodically flushed to MongoDB, which provides
  * at-least-once semantics.
  */
-public class MongoSink<IN> implements Sink<IN, DocumentBulk, DocumentBulk, Void> {
+public class MongoSink<IN> implements Sink<IN> {
 
     private final MongoClientProvider clientProvider;
 
@@ -80,50 +75,9 @@ public class MongoSink<IN> implements Sink<IN, DocumentBulk, DocumentBulk, Void>
     }
 
     @Override
-    public SinkWriter<IN, DocumentBulk, DocumentBulk> createWriter(
-            InitContext initContext, List<DocumentBulk> states) throws IOException {
+    public SinkWriter<IN> createWriter(InitContext context) throws IOException {
         MongoBulkWriter<IN> writer = new MongoBulkWriter<>(clientProvider, serializer, options);
-        writer.initializeState(states);
+        writer.initializeState();
         return writer;
-    }
-
-    @Override
-    public Optional<Committer<DocumentBulk>> createCommitter() throws IOException {
-        if (options.isTransactionEnable()) {
-            if (options.isUpsertEnable()) {
-                String[] upsertKeys = options.getUpsertKey();
-                return Optional.of(
-                        new MongoCommitter(clientProvider, options.isUpsertEnable(), upsertKeys));
-            }
-            return Optional.of(new MongoCommitter(clientProvider));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<GlobalCommitter<DocumentBulk, Void>> createGlobalCommitter()
-            throws IOException {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<SimpleVersionedSerializer<DocumentBulk>> getCommittableSerializer() {
-        if (options.isTransactionEnable()) {
-            return Optional.of(DocumentBulkSerializer.INSTANCE);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<SimpleVersionedSerializer<Void>> getGlobalCommittableSerializer() {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<SimpleVersionedSerializer<DocumentBulk>> getWriterStateSerializer() {
-        if (options.isTransactionEnable()) {
-            return Optional.of(DocumentBulkSerializer.INSTANCE);
-        }
-        return Optional.empty();
     }
 }
