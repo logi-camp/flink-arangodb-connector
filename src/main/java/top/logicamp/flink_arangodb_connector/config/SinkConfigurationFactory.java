@@ -22,9 +22,9 @@ public class SinkConfigurationFactory {
                 PropertiesUtil.getBoolean(
                         properties, ArangoDBOptions.SINK_FLUSH_ON_CHECKPOINT, false));
         configuration.setBulkFlushSize(
-                PropertiesUtil.getLong(properties, ArangoDBOptions.SINK_FLUSH_SIZE, 1_000L));
-        configuration.setBulkFlushInterval(
-                PropertiesUtil.getLong(properties, ArangoDBOptions.SINK_FLUSH_INTERVAL, 30_000L));
+                PropertiesUtil.getLong(properties, ArangoDBOptions.SINK_FLUSH_SIZE, 100L));
+            configuration.setBulkFlushInterval(
+                PropertiesUtil.getLong(properties, ArangoDBOptions.SINK_FLUSH_INTERVAL, 1_000L));
 
         // validate config
         if (configuration.isTransactional()) {
