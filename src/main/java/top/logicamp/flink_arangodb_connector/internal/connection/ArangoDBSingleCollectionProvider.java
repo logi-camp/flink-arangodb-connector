@@ -103,9 +103,9 @@ public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider 
         synchronized (this) {
             if (collection == null) {
                 collection = getDefaultDatabase().collection(defaultCollection);
-                if (!collection.exists()) {
-                    collection.create();
-                }
+            }
+            if (!collection.exists()) {
+                collection.create();
             }
         }
         return collection;
@@ -117,9 +117,8 @@ public class ArangoDBSingleCollectionProvider implements ArangoDBClientProvider 
     }
 
     @Override
-    public void recreateClient() {
-        close();
-        getDefaultCollection();
+    public ArangoCollection recreateCollectionAccess() {
+        return getDefaultCollection();
     }
 
     @Override

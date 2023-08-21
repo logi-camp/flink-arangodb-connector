@@ -10,7 +10,6 @@ import org.apache.flink.util.concurrent.ExecutorThreadFactory;
 
 import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDBException;
-import com.arangodb.entity.BaseDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,10 +198,13 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
 
     private void ensureConnection() {
         try {
-            collection.getInfo();
+            if(!collection.exists()){
+                collection = collectionProvider.recreateCollectionAccess();
+                LOGGER.warn("Collection not exists. Try to create it.");
+            };
         } catch (Exception e) {
-            LOGGER.warn("Connection is not available, try to reconnect", e);
-            collectionProvider.recreateClient();
+            LOGGER.warn("Connection is not available. Try to reconnect", e);
+            collection = collectionProvider.recreateCollectionAccess();
         }
     }
 
