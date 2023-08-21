@@ -162,9 +162,9 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
                         try {
                             // ordered, non-bypass mode
                             if (bulk.size() > 0) {
+                                collection.deleteDocuments(bulk.getDeletes().collect(Collectors.toList()));
                                 collection.insertDocuments(bulk.getInserts().collect(Collectors.toList()));
                                 collection.replaceDocuments(bulk.getUpdates().collect(Collectors.toList()));
-                                collection.deleteDocuments(bulk.getDeletes().collect(Collectors.toList()));
                             }
                             iterator.remove();
                             break;
@@ -184,9 +184,9 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
             do {
                 try {
                     if (bulk.size() > 0) {
+                        collection.deleteDocuments(bulk.getDeletes().collect(Collectors.toList()));
                         collection.insertDocuments(bulk.getInserts().collect(Collectors.toList()));
                         collection.replaceDocuments(bulk.getUpdates().collect(Collectors.toList()));
-                        collection.deleteDocuments(bulk.getDeletes().collect(Collectors.toList()));
                     }
                     iterator.remove();
                     break;

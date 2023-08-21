@@ -33,11 +33,10 @@ public class RowDataDocumentSerializer implements DocumentSerializer<RowData> {
             node = new BsonDocument();
         }
         try {
-            bsonConverter.convert(node, row.getRowKind());
+            bsonConverter.convert(node, row);
             var doc = new BaseDocument();
             doc.setProperties(new ObjectMapper().readValue(node.toJson(), HashMap.class));
             doc.setKey(doc.getAttribute(primaryKey).toString());
-            doc.addAttribute("_key", doc.getAttribute(primaryKey).toString());
             return new CDCDocument(doc, row.getRowKind());
         } catch (JsonProcessingException e) {
             throw new RuntimeException("can not serialize row '" + row + "'. ", e);

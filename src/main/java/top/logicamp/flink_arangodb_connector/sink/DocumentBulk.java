@@ -64,13 +64,12 @@ class DocumentBulk implements Serializable {
     Stream<BaseDocument> getUpdates() {
         return bufferedDocuments.stream().filter((i) -> i.getRowKind() == RowKind.UPDATE_AFTER).map((i)-> {
             var doc = i.getDocument();
-            doc.addAttribute("_key", doc.getKey());
             return doc;
         });
     }
 
     Stream<String> getDeletes() {
-        return bufferedDocuments.stream().filter((i) -> { System.out.println("deletes"+i.getDocument().toString()); return i.getRowKind() == RowKind.DELETE;}).map((i) -> i.getDocument().getKey());
+        return bufferedDocuments.stream().filter((i) -> { return i.getRowKind() == RowKind.DELETE;}).map((i) -> i.getDocument().getKey());
     }
 
     @Override
