@@ -16,11 +16,17 @@ repositories {
     }
 }
 
+ext {
+    javaVersion = '11'
+    flinkVersion = '1.17.1'
+    slf4jVersion = '1.7.36'
+    log4jVersion = '2.17.1'
+}
+
 dependencies {
-    compileOnly 'org.apache.flink:flink-connector-base:1.17.1'
     api 'org.mongodb:bson:4.7.1'
-    compileOnly 'com.google.guava:guava:31.1-jre'
-    compileOnly 'com.arangodb:arangodb-java-driver:7.1.0'
+    api 'com.google.guava:guava:31.1-jre'
+    api 'com.arangodb:arangodb-java-driver:7.1.0'
     api 'com.arangodb:core:7.1.0'
     api 'com.arangodb:http-protocol:7.1.0'
     api 'com.arangodb:vst-protocol:7.1.0'
@@ -30,13 +36,14 @@ dependencies {
     api 'com.arangodb:velocypack:3.0.0'
     api 'com.arangodb:jackson-dataformat-velocypack:4.1.0'
     testImplementation 'junit:junit:4.11'
-    testImplementation 'org.apache.flink:flink-clients:1.17.1'
-    compileOnly 'org.apache.flink:flink-core:1.17.1'
-    compileOnly 'org.apache.flink:flink-streaming-java:1.17.1'
-    compileOnly 'org.apache.flink:flink-json:1.17.1'
-    compileOnly 'org.apache.flink:flink-runtime:1.17.1'
-    compileOnly 'org.apache.flink:flink-table-planner_2.12:1.17.1'
-    compileOnly 'org.slf4j:slf4j-log4j12:1.7.26'
+    testImplementation "org.apache.flink:flink-clients:${flinkVersion}"
+    api "org.apache.flink:flink-core:${flinkVersion}"
+    api "org.apache.flink:flink-connector-base:${flinkVersion}"
+    api "org.apache.flink:flink-streaming-java:${flinkVersion}"
+    api "org.apache.flink:flink-json:${flinkVersion}"
+    api "org.apache.flink:flink-runtime:${flinkVersion}"
+    api "org.apache.flink:flink-table-planner-loader:${flinkVersion}"
+    api "org.slf4j:slf4j-log4j12:1.7.26"
 }
 
 group = 'top.logicamp.flink_arangodb_connector'
@@ -65,7 +72,10 @@ jar {
     }
 
     from {
-        configurations.runtimeClasspath.collect { it.name.contains("slf4j") || it.name.contains("jackson") ? null : it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.collect {
+            it.name.contains("slf4j") || it.name.contains("jackson")
+                    || it.path.contains("org/apache/flink") ? null : it.isDirectory() ? it : zipTree(it)
+        }
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
