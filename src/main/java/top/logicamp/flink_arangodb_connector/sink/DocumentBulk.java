@@ -1,7 +1,32 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) "2023" Logicamp
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package top.logicamp.flink_arangodb_connector.sink;
 
-import com.arangodb.entity.BaseDocument;
 import org.apache.flink.types.RowKind;
+
+import com.arangodb.entity.BaseDocument;
 import top.logicamp.flink_arangodb_connector.serde.CDCDocument;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -58,18 +83,28 @@ class DocumentBulk implements Serializable {
     }
 
     Stream<BaseDocument> getInserts() {
-        return bufferedDocuments.stream().filter((i) -> i.getRowKind() == RowKind.INSERT).map(CDCDocument::getDocument);
+        return bufferedDocuments.stream()
+                .filter((i) -> i.getRowKind() == RowKind.INSERT)
+                .map(CDCDocument::getDocument);
     }
 
     Stream<BaseDocument> getUpdates() {
-        return bufferedDocuments.stream().filter((i) -> i.getRowKind() == RowKind.UPDATE_AFTER).map((i)-> {
-            var doc = i.getDocument();
-            return doc;
-        });
+        return bufferedDocuments.stream()
+                .filter((i) -> i.getRowKind() == RowKind.UPDATE_AFTER)
+                .map(
+                        (i) -> {
+                            var doc = i.getDocument();
+                            return doc;
+                        });
     }
 
     Stream<String> getDeletes() {
-        return bufferedDocuments.stream().filter((i) -> { return i.getRowKind() == RowKind.DELETE;}).map((i) -> i.getDocument().getKey());
+        return bufferedDocuments.stream()
+                .filter(
+                        (i) -> {
+                            return i.getRowKind() == RowKind.DELETE;
+                        })
+                .map((i) -> i.getDocument().getKey());
     }
 
     @Override

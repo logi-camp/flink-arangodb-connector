@@ -1,9 +1,28 @@
-package top.logicamp.flink_arangodb_connector.sink;
+/*
+ * MIT License
+ *
+ * Copyright (c) "2023" Logicamp
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
-import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBClientProvider;
-import top.logicamp.flink_arangodb_connector.serde.CDCDocument;
-import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
+package top.logicamp.flink_arangodb_connector.sink;
 
 import org.apache.flink.api.connector.sink2.SinkWriter;
 import org.apache.flink.util.concurrent.ExecutorThreadFactory;
@@ -12,6 +31,10 @@ import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
+import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBClientProvider;
+import top.logicamp.flink_arangodb_connector.serde.CDCDocument;
+import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -21,15 +44,14 @@ import java.util.Iterator;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-/**
- * Writer for ArangoDB sink.
- */
+/** Writer for ArangoDB sink. */
 public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
     private final ArangoDBClientProvider collectionProvider;
 
     private transient ArangoCollection collection;
 
-    private final ConcurrentLinkedQueue<CDCDocument> currentBulk = new ConcurrentLinkedQueue<CDCDocument>();
+    private final ConcurrentLinkedQueue<CDCDocument> currentBulk =
+            new ConcurrentLinkedQueue<CDCDocument>();
 
     private final ArrayBlockingQueue<DocumentBulk> pendingBulks;
 
@@ -161,9 +183,12 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
                         try {
                             // ordered, non-bypass mode
                             if (bulk.size() > 0) {
-                                collection.deleteDocuments(bulk.getDeletes().collect(Collectors.toList()));
-                                collection.insertDocuments(bulk.getInserts().collect(Collectors.toList()));
-                                collection.replaceDocuments(bulk.getUpdates().collect(Collectors.toList()));
+                                collection.deleteDocuments(
+                                        bulk.getDeletes().collect(Collectors.toList()));
+                                collection.insertDocuments(
+                                        bulk.getInserts().collect(Collectors.toList()));
+                                collection.replaceDocuments(
+                                        bulk.getUpdates().collect(Collectors.toList()));
                             }
                             iterator.remove();
                             break;
@@ -198,10 +223,11 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
 
     private void ensureConnection() {
         try {
-            if(!collection.exists()){
+            if (!collection.exists()) {
                 collection = collectionProvider.recreateCollectionAccess();
                 LOGGER.warn("Collection not exists. Try to create it.");
-            };
+            }
+            ;
         } catch (Exception e) {
             LOGGER.warn("Connection is not available. Try to reconnect", e);
             collection = collectionProvider.recreateCollectionAccess();
