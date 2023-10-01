@@ -32,11 +32,10 @@ import top.logicamp.flink_arangodb_connector.serde.CDCDocument;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * DocumentBulk is buffered {@link BaseDocument} in memory, which would be written to ArangoDB in a
@@ -82,14 +81,33 @@ class DocumentBulk implements Serializable {
         return bufferedDocuments;
     }
 
-    Stream<BaseDocument> getInserts() {
+    Collection<List<CDCDocument>> groupedByKey() {
         return bufferedDocuments.stream()
+                .collect(groupingBy(document -> document.getDocument().getKey()))
+                .values();
+    }
+
+    Stream<CDCDocument> singles() {
+        return groupedByKey().stream()
+                .filter((list) -> list.size() <= 1)
+                .map((list) -> list.get(0));
+    }
+
+    Stream<CDCDocument> groupsEndWith_LastItem(RowKind rowKind) {
+        return groupedByKey().stream()
+                .filter((list) -> list.size() > 1) // Not singles
+                .filter((list) -> list.get(list.size() - 1).getRowKind() == rowKind) // Last item
+                .map((list) -> list.get(list.size() - 1));
+    }
+
+    Stream<BaseDocument> getInserts() {
+        return singles()
                 .filter((i) -> i.getRowKind() == RowKind.INSERT)
                 .map(CDCDocument::getDocument);
     }
 
     Stream<BaseDocument> getUpdates() {
-        return bufferedDocuments.stream()
+        return singles()
                 .filter((i) -> i.getRowKind() == RowKind.UPDATE_AFTER)
                 .map(
                         (i) -> {
@@ -99,12 +117,25 @@ class DocumentBulk implements Serializable {
     }
 
     Stream<String> getDeletes() {
-        return bufferedDocuments.stream()
+        return Stream.concat(
+                singles()
+                        .filter((i) -> i.getRowKind() == RowKind.DELETE)
+                        .map((i) -> i.getDocument().getKey()), // Single group deletes
+                groupsEndWith_LastItem(RowKind.DELETE)
+                        .map((doc) -> doc.getDocument().getKey()) // Groups end with delete
+                );
+    }
+
+    Stream<Map<String, Object>> getUpserts() {
+        return groupedByKey().stream()
+                .filter((list) -> list.size() > 1) // Not singles
                 .filter(
-                        (i) -> {
-                            return i.getRowKind() == RowKind.DELETE;
-                        })
-                .map((i) -> i.getDocument().getKey());
+                        (list) -> {
+                            var lastRowKind = list.get(list.size() - 1).getRowKind();
+                            return lastRowKind == RowKind.INSERT
+                                    || lastRowKind == RowKind.UPDATE_AFTER;
+                        }) // Last item
+                .map((list) -> list.get(list.size() - 1).getDocument().getProperties());
     }
 
     @Override
