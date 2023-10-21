@@ -24,11 +24,11 @@
 
 package top.logicamp.flink_arangodb_connector.sink;
 
-import com.arangodb.ArangoCursor;
 import org.apache.flink.api.connector.sink2.SinkWriter;
 import org.apache.flink.util.concurrent.ExecutorThreadFactory;
 
 import com.arangodb.ArangoCollection;
+import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDBException;
 import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.BaseDocument;
@@ -45,14 +45,11 @@ import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-/**
- * Writer for ArangoDB sink.
- */
+/** Writer for ArangoDB sink. */
 public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
     private final ArangoDBClientProvider collectionProvider;
 
@@ -179,7 +176,7 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
      * for some ArangoDB setups (e.g. standalone instances). TODO: This should be configurable in
      * the future.
      */
-    private synchronized void flush() throws IOException  {
+    private synchronized void flush() throws IOException {
         if (!closed) {
             ensureConnection();
             retryPolicy.reset();
@@ -193,24 +190,29 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
                         try {
                             // ordered, non-bypass mode
                             if (bulk.size() > 0) {
-                                collection.deleteDocuments(bulk.getDeletes().collect(Collectors.toList()));
-                                collection.insertDocuments(bulk.getInserts().collect(Collectors.toList()));
-                                collection.replaceDocuments(bulk.getUpdates().collect(Collectors.toList()));
+                                collection.deleteDocuments(
+                                        bulk.getDeletes().collect(Collectors.toList()));
+                                collection.insertDocuments(
+                                        bulk.getInserts().collect(Collectors.toList()));
+                                collection.replaceDocuments(
+                                        bulk.getUpdates().collect(Collectors.toList()));
                                 Map upsertList =
                                         Collections.singletonMap(
-                                                "list", bulk.getUpserts().collect(Collectors.toList()));
-                                ArangoCursor<BaseDocument> cursor = database.query(
-                                        "FOR item in @list \n"
-                                                + "UPSERT { _key: item._key } \n"
-                                                + "INSERT item \n"
-                                                + "UPDATE item IN "
-                                                + collection.name(),
-                                        BaseDocument.class,
-                                        upsertList
-                                );
-                                cursor.forEachRemaining(aDocument -> {
-                                    LOGGER.debug("Upsert done " + aDocument.getKey());
-                                });
+                                                "list",
+                                                bulk.getUpserts().collect(Collectors.toList()));
+                                ArangoCursor<BaseDocument> cursor =
+                                        database.query(
+                                                "FOR item in @list \n"
+                                                        + "UPSERT { _key: item._key } \n"
+                                                        + "INSERT item \n"
+                                                        + "UPDATE item IN "
+                                                        + collection.name(),
+                                                BaseDocument.class,
+                                                upsertList);
+                                cursor.forEachRemaining(
+                                        aDocument -> {
+                                            LOGGER.debug("Upsert done " + aDocument.getKey());
+                                        });
                             }
                             iterator.remove();
                             break;
@@ -225,7 +227,7 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
         }
     }
 
-    private void flushUpsert(Iterator<DocumentBulk> iterator) throws IOException  {
+    private void flushUpsert(Iterator<DocumentBulk> iterator) throws IOException {
         while (iterator.hasNext()) {
             DocumentBulk bulk = iterator.next();
             do {
@@ -237,19 +239,19 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
                         Map upsertList =
                                 Collections.singletonMap(
                                         "list", bulk.getUpserts().collect(Collectors.toList()));
-                        ArangoCursor<BaseDocument> cursor = database.query(
-                                "FOR item in @list \n"
-                                        + "UPSERT { _key: item._key } \n"
-                                        + "INSERT item \n"
-                                        + "UPDATE item IN "
-                                        + collection.name(),
-                                BaseDocument.class,
-                                upsertList
-                        );
-                        cursor.forEachRemaining(aDocument -> {
-                            LOGGER.debug("Upsert done " + aDocument.getKey());
-                        });
-
+                        ArangoCursor<BaseDocument> cursor =
+                                database.query(
+                                        "FOR item in @list \n"
+                                                + "UPSERT { _key: item._key } \n"
+                                                + "INSERT item \n"
+                                                + "UPDATE item IN "
+                                                + collection.name(),
+                                        BaseDocument.class,
+                                        upsertList);
+                        cursor.forEachRemaining(
+                                aDocument -> {
+                                    LOGGER.debug("Upsert done " + aDocument.getKey());
+                                });
                     }
                     iterator.remove();
                     break;
@@ -274,11 +276,11 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
         }
     }
 
-    private void rollBulkIfNeeded() throws IOException  {
+    private void rollBulkIfNeeded() throws IOException {
         rollBulkIfNeeded(false);
     }
 
-    private synchronized void rollBulkIfNeeded(boolean force) throws IOException  {
+    private synchronized void rollBulkIfNeeded(boolean force) throws IOException {
         int size = currentBulk.size();
         if (force || size >= maxSize) {
             DocumentBulk bulk = new DocumentBulk(maxSize);
@@ -293,7 +295,7 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
         }
     }
 
-    private synchronized void enqueuePendingBulk(DocumentBulk bulk) throws IOException  {
+    private synchronized void enqueuePendingBulk(DocumentBulk bulk) throws IOException {
         boolean isEnqueued = pendingBulks.offer(bulk);
         if (!isEnqueued) {
             // pending queue is full, thus block processing if it's transactional sink,
