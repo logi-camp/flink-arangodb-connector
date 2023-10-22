@@ -33,28 +33,22 @@ import org.bson.types.Decimal128;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Locale;
 
 public class RowDataToBsonConverters implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public RowDataToBsonConverters() {
-    }
+    public RowDataToBsonConverters() {}
 
     public RowDataToBsonConverter createConverter(LogicalType type) {
         return this.wrapIntoNullableConverter(this.createNotNullConverter(type));
     }
 
     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
 
     private RowDataToBsonConverter createNotNullConverter(LogicalType type) {
         switch (type.getTypeRoot()) {
@@ -124,8 +118,7 @@ public class RowDataToBsonConverters implements Serializable {
     private RowDataToBsonConverter createTimestampConverter() {
         return (reuse, value) -> {
             TimestampData timestamp = (TimestampData) value;
-            return new BsonString(
-                    formatter.format(new Date(timestamp.getMillisecond())));
+            return new BsonString(formatter.format(new Date(timestamp.getMillisecond())));
         };
     }
 
@@ -135,8 +128,7 @@ public class RowDataToBsonConverters implements Serializable {
             // adjust to local zone by add the zone offset
             long epochMillis = timestampWithLocalZone.toInstant().getNano() / 1_000L;
             int offsetSeconds = ZoneOffset.of(ZoneId.systemDefault().getId()).getTotalSeconds();
-            return new BsonString(
-                    formatter.format((epochMillis + offsetSeconds * 1000L)));
+            return new BsonString(formatter.format((epochMillis + offsetSeconds * 1000L)));
         };
     }
 
