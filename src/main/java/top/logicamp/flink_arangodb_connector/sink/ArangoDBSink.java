@@ -35,7 +35,6 @@ import top.logicamp.flink_arangodb_connector.internal.connection.ArangoDBColloct
 import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Properties;
 
 /** Flink sink connector for ArangoDB. */
@@ -82,8 +81,7 @@ public class ArangoDBSink<IN> implements Sink<IN> {
                         .withTransactionEnable(sinkConfiguration.isTransactional())
                         .withFlushOnCheckpoint(sinkConfiguration.isFlushOnCheckpoint())
                         .withFlushSize((int) sinkConfiguration.getBulkFlushSize())
-                        .withFlushInterval(
-                                Duration.ofMillis(sinkConfiguration.getBulkFlushInterval()))
+                        .withFlushInterval(sinkConfiguration.getBulkFlushInterval())
                         .build();
     }
 

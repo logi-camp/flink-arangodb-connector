@@ -42,7 +42,6 @@ import top.logicamp.flink_arangodb_connector.serde.DocumentSerializer;
 import javax.annotation.concurrent.NotThreadSafe;
 
 import java.io.IOException;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -96,12 +95,12 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
         this.pendingBulks = new ArrayBlockingQueue<>(options.getMaxInFlightFlushes());
         this.flushOnCheckpoint = options.getFlushOnCheckpoint();
         this.options = options;
-        if (!flushOnCheckpoint && this.options.getFlushInterval().getSeconds() > 0) {
+        if (!flushOnCheckpoint && this.options.getFlushInterval() > 0) {
             this.scheduler =
                     Executors.newScheduledThreadPool(
                             1, new ExecutorThreadFactory("arangodb-bulk-writer"));
             this.scheduledFuture =
-                    scheduler.scheduleWithFixedDelay(
+                    scheduler.scheduleAtFixedRate(
                             () -> {
                                 synchronized (ArangoDBBulkWriter.this) {
                                     if (initialized && !closed) {
@@ -114,9 +113,9 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
                                     }
                                 }
                             },
-                            options.getFlushInterval().get(ChronoUnit.SECONDS),
-                            options.getFlushInterval().get(ChronoUnit.SECONDS),
-                            TimeUnit.SECONDS);
+                            options.getFlushInterval(),
+                            options.getFlushInterval(),
+                            TimeUnit.MILLISECONDS);
         }
     }
 

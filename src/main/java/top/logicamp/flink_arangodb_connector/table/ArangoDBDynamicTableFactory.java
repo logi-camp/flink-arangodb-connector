@@ -37,8 +37,6 @@ import org.apache.flink.util.Preconditions;
 
 import top.logicamp.flink_arangodb_connector.config.ArangoDBConnectorOptions;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class ArangoDBDynamicTableFactory implements DynamicTableSinkFactory, DynamicTableFactory {
@@ -99,10 +97,10 @@ public class ArangoDBDynamicTableFactory implements DynamicTableSinkFactory, Dyn
                     .intType()
                     .defaultValue(1000)
                     .withDescription("flush size");
-    private static final ConfigOption<Duration> FLUSH_INTERVAL =
+    private static final ConfigOption<Long> FLUSH_INTERVAL =
             ConfigOptions.key("sink.flush.interval")
-                    .durationType()
-                    .defaultValue(Duration.of(30_000L, ChronoUnit.MILLIS))
+                    .longType()
+                    .defaultValue(3000L)
                     .withDescription("flush interval");
 
     private static final ConfigOption<Integer> MAX_IN_FIGHT_FLUSHES =

@@ -25,7 +25,6 @@
 package top.logicamp.flink_arangodb_connector.config;
 
 import java.io.Serializable;
-import java.time.Duration;
 
 /** ArangoDB connector options. */
 public class ArangoDBConnectorOptions implements Serializable {
@@ -41,7 +40,7 @@ public class ArangoDBConnectorOptions implements Serializable {
     protected final boolean transactionEnable;
     protected final boolean flushOnCheckpoint;
     protected final int flushSize;
-    protected final Duration flushInterval;
+    protected final Long flushInterval;
     protected final int maxInFlightFlushes;
     protected final boolean upsertEnable;
     protected final String[] upsertKey;
@@ -57,7 +56,7 @@ public class ArangoDBConnectorOptions implements Serializable {
             boolean transactionEnable,
             boolean flushOnCheckpoint,
             int flushSize,
-            Duration flushInterval,
+            Long flushInterval,
             int maxInFlightFlushes,
             boolean upsertEnable,
             String[] upsertKey) {
@@ -117,7 +116,7 @@ public class ArangoDBConnectorOptions implements Serializable {
         return flushSize;
     }
 
-    public Duration getFlushInterval() {
+    public Long getFlushInterval() {
         return flushInterval;
     }
 
@@ -150,7 +149,7 @@ public class ArangoDBConnectorOptions implements Serializable {
         protected boolean transactionEnable;
         protected boolean flushOnCheckpoint;
         protected int flushSize;
-        protected Duration flushInterval;
+        protected Long flushInterval;
         protected int maxInFlightFlushes = 5;
         protected boolean upsertEnable;
         protected String[] upsertKey;
@@ -190,7 +189,7 @@ public class ArangoDBConnectorOptions implements Serializable {
             return this;
         }
 
-        public Builder withFlushInterval(Duration flushInterval) {
+        public Builder withFlushInterval(Long flushInterval) {
             this.flushInterval = flushInterval;
             return this;
         }
