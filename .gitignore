@@ -31,7 +31,7 @@ atlassian-ide-plugin.xml
 
 # code review
 codereview.rc
-
+bin/*
 # local settings
 **/gradle.properties
 .java-version
