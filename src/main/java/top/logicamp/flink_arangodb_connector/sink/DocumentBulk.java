@@ -34,6 +34,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 /**
  * DocumentBulk is buffered {@link BaseDocument} in memory, which would be
@@ -82,40 +83,21 @@ class DocumentBulk implements Serializable {
         return bufferedDocuments;
     }
 
-    /*
-     * Collection<List<CDCDocument>> groupedByKey() {
-     * return bufferedDocuments.stream()
-     * .collect(groupingBy(document -> document.getDocument().getKey()))
-     * .values();
-     * }
-     */
-
-    /*
-     * Stream<CDCDocument> singles() {
-     * return groupedByKey().stream()
-     * .filter((list) -> list.size() <= 1)
-     * .map((list) -> list.get(0));
-     * }
-     */
-
-    /*
-     * Stream<CDCDocument> groupsEndWith_LastItem(RowKind rowKind) {
-     * return groupedByKey().stream()
-     * .filter((list) -> list.size() > 1) // Not singles
-     * .filter((list) -> list.get(list.size() - 1).getRowKind() == rowKind) // Last
-     * item
-     * .map((list) -> list.get(list.size() - 1));
-     * }
-     */
+    Stream<CDCDocument> lastItemOfKeys() {
+        return bufferedDocuments.stream()
+                .collect(Collectors.groupingBy(document -> document.getDocument().getKey()))
+                .values().stream()
+                .map((list) -> list.get(list.size() - 1));
+    }
 
     Stream<BaseDocument> getRepserts() {
-        return bufferedDocuments.stream()
+        return lastItemOfKeys()
                 .filter((i) -> i.getRowKind() == RowKind.INSERT || i.getRowKind() == RowKind.UPDATE_AFTER)
                 .map(CDCDocument::getDocument);
     }
 
     Stream<String> getDeletes() {
-        return bufferedDocuments.stream()
+        return lastItemOfKeys()
                 .filter((i) -> i.getRowKind() == RowKind.DELETE)
                 .map((i) -> i.getDocument().getKey());
     }

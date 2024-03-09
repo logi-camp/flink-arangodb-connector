@@ -77,7 +77,7 @@ dependencies {
 }
 
 group = 'top.logicamp.flink_arangodb_connector'
-version = '1.1.0-SNAPSHOT'
+version = '1.2.0-SNAPSHOT'
 description = 'flink-arangodb-connector'
 java.sourceCompatibility = JavaVersion.VERSION_11
 

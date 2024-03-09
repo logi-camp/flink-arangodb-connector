@@ -194,7 +194,8 @@ public class ArangoDBBulkWriter<IN> implements SinkWriter<IN> {
                             if (bulk.size() > 0) {
                                 collection.deleteDocuments(
                                         bulk.getDeletes().collect(Collectors.toList()));
-                                collection.insertDocuments(bulk.getRepserts().collect(Collectors.toList()),
+                                collection.insertDocuments(
+                                        bulk.getRepserts().collect(Collectors.toList()),
                                         new DocumentCreateOptions()
                                                 .overwriteMode(OverwriteMode.replace)
                                                 .waitForSync(true)
