@@ -25,8 +25,10 @@
 package top.logicamp.flink_arangodb_connector.sink;
 
 import org.apache.flink.types.RowKind;
+import org.slf4j.*;
 
 import com.arangodb.entity.BaseDocument;
+
 import top.logicamp.flink_arangodb_connector.serde.CDCDocument;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -53,6 +55,8 @@ class DocumentBulk implements Serializable {
     private final long maxSize;
 
     private static final int BUFFER_INIT_SIZE = Integer.MAX_VALUE;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentBulk.class);
 
     DocumentBulk(long maxSize) {
         this.maxSize = maxSize;
@@ -83,22 +87,40 @@ class DocumentBulk implements Serializable {
         return bufferedDocuments;
     }
 
-    Stream<CDCDocument> lastItemOfKeys() {
-        return bufferedDocuments.stream()
-                .collect(Collectors.groupingBy(document -> document.getDocument().getKey()))
-                .values().stream()
-                .map((list) -> list.get(list.size() - 1));
+    Collection<CDCDocument> lastItemOfKeys() {
+        // Using a LinkedHashMap to maintain the insertion order
+        Map<String, CDCDocument> map = new LinkedHashMap<>();
+        for (CDCDocument obj : bufferedDocuments) {
+            map.put(obj.getDocument().getKey(), obj);
+        }
+
+        // Get the list of values from the map
+        return map.values();
     }
 
     Stream<BaseDocument> getRepserts() {
-        return lastItemOfKeys()
-                .filter((i) -> i.getRowKind() == RowKind.INSERT || i.getRowKind() == RowKind.UPDATE_AFTER)
+        return lastItemOfKeys().stream()
+                .filter((i) -> {
+                    if (i.getRowKind() == RowKind.INSERT || i.getRowKind() == RowKind.UPDATE_AFTER) {
+                        LOGGER.debug("repsert detected", i.getDocument().getKey(), i.getRowKind());
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })
                 .map(CDCDocument::getDocument);
     }
 
     Stream<String> getDeletes() {
-        return lastItemOfKeys()
-                .filter((i) -> i.getRowKind() == RowKind.DELETE)
+        return lastItemOfKeys().stream()
+                .filter((i) -> {
+                    if (i.getRowKind() == RowKind.DELETE) {
+                        LOGGER.debug("delete detected", i.getDocument().getKey(), i.getRowKind());
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })
                 .map((i) -> i.getDocument().getKey());
     }
 
